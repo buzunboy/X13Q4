@@ -29,6 +29,8 @@ class cellClass: UITableViewCell{
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var editorChoiceLabel: UILabel!
     @IBOutlet weak var statusLabel: UILabel!
+    
+    
     @IBOutlet weak var approveButtonView: UIButton!
     
     
@@ -36,11 +38,11 @@ class cellClass: UITableViewCell{
     @IBAction func approveButton(_ sender: Any) {
         
         let addedDictionary = [
-        "EventName":eventName.text,
-        "DateAndVenue":venueDateName.text
+            "EventName":eventName.text,
+            "DateAndVenue":venueDateName.text
         ]
         ref.child("Events").child(eventLink.text!).setValue(addedDictionary)
-       
+        
         if(approvedEvent.contains(eventLink.text!)){
             approveButtonView.setTitle("Approved", for: .normal)
             approveButtonView.backgroundColor = UIColor.blue
@@ -62,7 +64,7 @@ class EventsTableViewController: UITableViewController {
         super.viewDidLoad()
         
         self.navigationController?.navigationBar.isHidden = false
-            self.navigationItem.setHidesBackButton(true, animated: false)
+        self.navigationItem.setHidesBackButton(true, animated: false)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -80,26 +82,31 @@ class EventsTableViewController: UITableViewController {
     
     func getList(){
         
+        
         if FBSDKAccessToken.current() != nil {
             
             for venue in venueLists{
                 let venueEventID = "/" + venue + "/events"
-                let request: FBSDKGraphRequest  = FBSDKGraphRequest(graphPath: venueEventID, parameters: ["fields": "id, name, start_time, picture, place"])
+                let request: FBSDKGraphRequest  = FBSDKGraphRequest(graphPath: venueEventID, parameters: ["fields": "attending_count,category,cover,description,interested_count,name,owner,picture,ticket_uri,place,start_time"])
                 request.start { (connection, results, error) in
                     
                     // Something went wrong
                     if (error != nil) {
                         print(error as Any)
                     }
-                    // print(results)
+                     print(results)
                     
                     if let eventData = results as? NSDictionary{
                         
                         let events = eventData["data"] as? NSArray
                         for event in events! {
                             let eventDictionary = event as? NSDictionary
-                            let eventName = eventDictionary?["name"] as! String
                             let eventID = eventDictionary?["id"] as! String
+                            let placeData = eventDictionary?["place"] as? NSDictionary
+                            let pictureData = eventDictionary?["cover"] as? NSDictionary
+                            
+                            let eventName = eventDictionary?["name"] as! String
+                            
                             eventIDList.append(eventID)
                             let eventDate = eventDictionary?["start_time"] as! String
                             var dateArray = eventDate._split(separator: "-")
@@ -109,9 +116,10 @@ class EventsTableViewController: UITableViewController {
                             var timeArray = dayArray[1]._split(separator: ":")
                             let hour = timeArray[0]
                             let minutes = timeArray[1]
-                            let pictureData = eventDictionary?["picture"] as? NSDictionary
-                            let picture = pictureData?["data"] as? NSDictionary
-                            let pictureURL = picture?["url"] as! String
+                            let pictureDatas = eventDictionary?["cover"] as? NSDictionary
+                            let pictureURL = pictureDatas?["source"] as! String
+                            
+                            
                             pictureList.append(pictureURL)
                             list.append(eventName)
                             let venuesData = eventDictionary?["place"] as? NSDictionary
@@ -119,6 +127,41 @@ class EventsTableViewController: UITableViewController {
                             let convertedDate = String(date) + " " + convertMonth(month: month) + " " + String(hour) + ":" + String(minutes)
                             dateList.append(venueName! + " @ " + convertedDate)
                             self.tableList.reloadData()
+                            let startTime = eventDictionary?["start_time"] as! String
+                            var dateArrays = startTime._split(separator: "T")
+                            var splitDate = dateArrays[0]._split(separator: "-")
+                            let timeArrays = dateArrays[1]._split(separator: ":")
+
+                            ref.child("Events").child(eventID).observe(.value, with: { (snapshot) in
+                               let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
+                                if (isApproved != "1"){
+                                    let nonApproved = [
+                                        "isApproved": "0",
+                                        "likeCount":0,
+                                        "seenCount":0,
+                                        "commentCount":0
+                                    ] as [String : Any]
+                                    ref.child("Events").child(eventID).updateChildValues(nonApproved)
+                                }
+
+                            })
+                            
+                            let eventDictionaryDatabase = [
+                            "EventName":eventName,
+                            "VenueName":placeData?["name"] as? String,
+                            "EventImage":pictureData?["source"] as? String,
+                            "TicketLink": eventDictionary?["ticket_uri"] as? String,
+                            "Details":eventDictionary?["description"] as? String,
+                            "Day":splitDate[2],
+                            "Month":splitDate[1],
+                            "Year":splitDate[0],
+                            "Hour":timeArray[0],
+                            "Minutes":timeArray[1],
+                            "VenueID":placeData?["id"] as? String
+                            ]
+                            ref.child("Events").child(eventID).updateChildValues(eventDictionaryDatabase)
+                            
+                            
                         }
                     }
                 }
@@ -149,7 +192,15 @@ class EventsTableViewController: UITableViewController {
         cell.eventName.text = list[indexPath.row]
         cell.venueDateName.text = dateList[indexPath.row]
         cell.eventLink.text = eventIDList[indexPath.row]
-
+        let url = URL(string: pictureList[indexPath.row])
+        
+        DispatchQueue.global().async {
+            let data = try? Data(contentsOf: url!)
+            DispatchQueue.main.async {
+                cell.eventImage.image = UIImage(data: data!)
+            }
+        }
+        
         return cell
     }
     
