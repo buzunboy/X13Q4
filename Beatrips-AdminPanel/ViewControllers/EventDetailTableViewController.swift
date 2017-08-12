@@ -16,22 +16,24 @@ import MapKit
 class EventDetailTableViewController: UITableViewController {
     
     @IBOutlet weak var eventImage: UIImageView!
-    @IBOutlet weak var eventName: UILabel!
-    @IBOutlet weak var venueName: UILabel!
-    @IBOutlet weak var ticketLink: UILabel!
+    @IBOutlet weak var ticketLink: UITextField!
     @IBOutlet weak var descriptionText: UITextView!
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var eventNameField: UITextView!
+    @IBOutlet weak var venueNameField: UITextView!
     
-    @IBOutlet weak var dayLabel: UILabel!
-    @IBOutlet weak var monthLabel: UILabel!
-    @IBOutlet weak var yearLabel: UILabel!
-    @IBOutlet weak var hourLabel: UILabel!
-    @IBOutlet weak var minuteLabel: UILabel!
+    @IBOutlet weak var dayLabel: UITextField!
+    @IBOutlet weak var monthLabel: UITextField!
+    @IBOutlet weak var yearLabel: UITextField!
+    @IBOutlet weak var hourLabel: UITextField!
+    @IBOutlet weak var minuteLabel: UITextField!
+    
+    
     
     @IBOutlet weak var isApprovedLabel: UILabel!
-    @IBOutlet weak var seenCountLabel: UILabel!
-    @IBOutlet weak var likedCountLabel: UILabel!
-    @IBOutlet weak var commentCountLabel: UILabel!
+    @IBOutlet weak var seenCountLabel: UITextField!
+    @IBOutlet weak var likedCountLabel: UITextField!
+    @IBOutlet weak var commentCountLabel: UITextField!
     
     @IBOutlet weak var hiddenImageURL: UILabel!
     @IBOutlet weak var seeMore: UIButton!
@@ -96,24 +98,26 @@ class EventDetailTableViewController: UITableViewController {
                 "EventImage": snapshot.childSnapshot(forPath: "EventImage").value as! String,
                 "VenueID": snapshot.childSnapshot(forPath: "VenueID").value as! String,
                 "Details": snapshot.childSnapshot(forPath: "Details").value as! String,
+                "TicketLink": snapshot.childSnapshot(forPath: "TicketLink").value as? String,
                 "Day": snapshot.childSnapshot(forPath: "Day").value as! String,
                 "Month": snapshot.childSnapshot(forPath: "Month").value as! String,
                 "Year": snapshot.childSnapshot(forPath: "Year").value as! String,
                 "Hour": snapshot.childSnapshot(forPath: "Hour").value as! String,
                 "Minutes": snapshot.childSnapshot(forPath: "Minutes").value as! String,
                 "isApproved": snapshot.childSnapshot(forPath: "isApproved").value as! String,
-                "likeCount": snapshot.childSnapshot(forPath: "likeCount").value as! Int,
-                "seenCount": snapshot.childSnapshot(forPath: "seenCount").value as! Int,
-                "commentCount": snapshot.childSnapshot(forPath: "commentCount").value as! Int,
+                "likeCount": snapshot.childSnapshot(forPath: "likeCount").value as! String,
+                "seenCount": snapshot.childSnapshot(forPath: "seenCount").value as! String,
+                "commentCount": snapshot.childSnapshot(forPath: "commentCount").value as! String,
                 ] as [String:Any]
-            self.eventName.text = eventInfo["EventName"] as? String
-            self.venueName.text = eventInfo["VenueName"] as? String
+            self.eventNameField.text = eventInfo["EventName"] as? String
+            self.venueNameField.text = eventInfo["VenueName"] as? String
             self.descriptionText.text = eventInfo["Details"] as? String
             self.dayLabel.text = eventInfo["Day"] as? String
             self.monthLabel.text = eventInfo["Month"] as? String
             self.yearLabel.text = eventInfo["Year"] as? String
             self.hourLabel.text = eventInfo["Hour"] as? String
             self.minuteLabel.text = eventInfo["Minutes"] as? String
+            self.ticketLink.text = eventInfo["TicketLink"] as? String
             
             let isApproved = eventInfo["isApproved"] as? String
             self.isApprovedLabel.text = (isApproved == "1") ? "YES" : "NO"
@@ -217,9 +221,30 @@ class EventDetailTableViewController: UITableViewController {
     
     func approveEvent(){
         let ref = Database.database().reference()
+        
+        ref.child("Events").child(selectedID).observe(.value) { (snapshot) in
+            if (snapshot.childSnaphot(forpath: "isApproved") == "1"){
+                
+            }
+            
+        }
+        
         let addedDictionary = [
+            "EventName":eventNameField.text ?? "",
+            "VenueName":venueNameField.text ?? "",
+            "Details": descriptionText.text ?? "",
+            "TicketLink": ticketLink.text ?? "",
+            "Day": dayLabel.text ?? "",
+            "Month":monthLabel.text ?? "",
+            "Year":yearLabel.text ?? "",
+            "Hour":hourLabel.text ?? "",
+            "Minutes":minuteLabel.text ?? "",
+            "EventImage":hiddenImageURL.text ?? "",
+            "commentCount":commentCountLabel.text ?? "",
+            "likeCount":likedCountLabel.text ?? "",
+            "seenCount":seenCountLabel.text ?? "",
             "isApproved":"1",
-            ]
+            ] as [String : Any]
         ref.child("Events").child(selectedID).updateChildValues(addedDictionary)
     }
     
@@ -232,7 +257,7 @@ class EventDetailTableViewController: UITableViewController {
                 self.navBar.backgroundColor = UIColor(red: 0.1, green: 0.1, blue: 0.1, alpha: 1)
                 let topView = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
                 topView.textColor = UIColor.white
-                topView.text = self.eventName.text
+                topView.text = self.eventNameField.text
                 self.navBar.topItem?.titleView = topView
 
             })
@@ -299,14 +324,12 @@ class EventDetailTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if(selectedRow == indexPath.row){
-            selectedRow = -1
-        } else {
-        selectedRow = indexPath.row
+        if(indexPath.row == 6){
+            selectedRow = 6
+            self.tableView.beginUpdates()
+            self.tableView.endUpdates()
         }
-        self.tableView.beginUpdates()
-     //   self.tableView.reloadRows(at: [IndexPath(row:6, section:0)], with: .fade)
-        self.tableView.endUpdates()
+       
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

@@ -136,31 +136,26 @@ class EventsTableViewController: UITableViewController {
                                let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
                                 if (isApproved != "1"){
                                     let nonApproved = [
+                                        "EventName":eventName,
+                                        "VenueName":placeData?["name"] as? String,
+                                        "EventImage":pictureData?["source"] as? String,
+                                        "TicketLink": eventDictionary?["ticket_uri"] as? String,
+                                        "Details":eventDictionary?["description"] as? String,
+                                        "Day":splitDate[2],
+                                        "Month":splitDate[1],
+                                        "Year":splitDate[0],
+                                        "Hour":timeArray[0],
+                                        "Minutes":timeArray[1],
+                                        "VenueID":placeData?["id"] as? String,
                                         "isApproved": "0",
-                                        "likeCount":0,
-                                        "seenCount":0,
-                                        "commentCount":0
+                                        "likeCount":"0",
+                                        "seenCount":"0",
+                                        "commentCount":"0"
                                     ] as [String : Any]
                                     ref.child("Events").child(eventID).updateChildValues(nonApproved)
                                 }
 
                             })
-                            
-                            let eventDictionaryDatabase = [
-                            "EventName":eventName,
-                            "VenueName":placeData?["name"] as? String,
-                            "EventImage":pictureData?["source"] as? String,
-                            "TicketLink": eventDictionary?["ticket_uri"] as? String,
-                            "Details":eventDictionary?["description"] as? String,
-                            "Day":splitDate[2],
-                            "Month":splitDate[1],
-                            "Year":splitDate[0],
-                            "Hour":timeArray[0],
-                            "Minutes":timeArray[1],
-                            "VenueID":placeData?["id"] as? String
-                            ]
-                            ref.child("Events").child(eventID).updateChildValues(eventDictionaryDatabase)
-                            
                             
                         }
                     }
