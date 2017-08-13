@@ -26,12 +26,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Beatrips-AdminPanel/ViewControllers/EventsTableViewController.swift"
-            timestampString = "524322469.447682"
+            timestampString = "524352521.460039"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "103"
-            endingLineNumber = "103"
-            landmarkName = "previewingContext(_:viewControllerForLocation:)"
+            startingLineNumber = "301"
+            endingLineNumber = "301"
+            landmarkName = "EventsTableViewController"
+            landmarkType = "3">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Beatrips-AdminPanel/ViewControllers/EventsTableViewController.swift"
+            timestampString = "524352521.460039"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "230"
+            endingLineNumber = "230"
+            landmarkName = "tableView(_:cellForRowAt:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -42,12 +58,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Beatrips-AdminPanel/ViewControllers/EventsTableViewController.swift"
-            timestampString = "524324840.268833"
+            timestampString = "524352287.271263"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "244"
-            endingLineNumber = "244"
-            landmarkName = "tableView(_:numberOfRowsInSection:)"
+            startingLineNumber = "152"
+            endingLineNumber = "152"
+            landmarkName = "sendToDatabase()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -58,12 +74,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Beatrips-AdminPanel/ViewControllers/EventsTableViewController.swift"
-            timestampString = "524324840.268833"
+            timestampString = "524352521.460039"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "176"
+            endingLineNumber = "176"
+            landmarkName = "sendToDatabase()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Beatrips-AdminPanel/ViewControllers/EventsTableViewController.swift"
+            timestampString = "524352521.460039"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "180"
             endingLineNumber = "180"
-            landmarkName = "getList()"
+            landmarkName = "sendToDatabase()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
