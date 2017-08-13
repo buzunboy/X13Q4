@@ -17,6 +17,7 @@ var venueLists: [String] = ["8087014348"]
 var pictureList: [String] = []
 var eventIDList: [String] = []
 var selectedID: String = ""
+var EventList = [EventModel]()
 var ref = Database.database().reference()
 
 class cellClass: UITableViewCell{
@@ -56,12 +57,13 @@ class cellClass: UITableViewCell{
     
 }
 
-class EventsTableViewController: UITableViewController, UISearchBarDelegate {
+class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIViewControllerPreviewingDelegate {
     
     @IBOutlet var tableList: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
+
     
-    var filteredData = [String]()
+    var filteredData = [EventModel]()
     var isSearching = false
     
     override func viewDidLoad() {
@@ -72,6 +74,12 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate {
         
         searchBar.delegate = self
         searchBar.returnKeyType = UIReturnKeyType.done
+        
+        if( traitCollection.forceTouchCapability == .available){
+            
+            registerForPreviewing(with: self, sourceView: view)
+            
+        }
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -87,6 +95,21 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate {
     }
     
     
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
+        guard let indexPath = tableView.indexPathForRow(at: location) else { return nil }
+        guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
+        guard let detailVC = storyboard?.instantiateViewController(withIdentifier: "EventDetailTableViewController") as? EventDetailTableViewController else { return nil }
+        
+        selectedID = eventIDList[indexPath.row]
+        
+        return detailVC
+    }
+    
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
+        
+        show(viewControllerToCommit, sender: self)
+        
+    }
     
     func getList(){
         
@@ -140,6 +163,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate {
                             var dateArrays = startTime._split(separator: "T")
                             var splitDate = dateArrays[0]._split(separator: "-")
                             let timeArrays = dateArrays[1]._split(separator: ":")
+                            EventList.append(EventModel(name: eventName, ID: eventID, venue: placeData!["name"] as! String, venueID: placeData!["id"] as! String, image: pictureData!["source"] as! String, ticket: eventDictionary!["ticket_uri"] as? String ?? "", descriptionText: eventDictionary!["description"] as! String, day: splitDate[2], month: splitDate[1], year: splitDate[0], hour: timeArray[0], minute: timeArray[1], isApproved: "0", likeCount: "0", seenCount: "0", commentCount: "0", latitude: String(describing: placeLocation!["latitude"]), longitude: String(describing: placeLocation!["longitude"])))
 
                             ref.child("Events").child(eventID).observe(.value, with: { (snapshot) in
                                let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
@@ -191,7 +215,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate {
         if isSearching {
             return filteredData.count
         } else {
-        return list.count
+        return EventList.count
         }
     }
     
@@ -201,16 +225,26 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "eventCell", for: indexPath) as! cellClass
         
         if(isSearching){
-            cell.eventName.text = filteredData[indexPath.row]
-            cell.venueDateName.text = ""
-            cell.eventImage.image = UIImage()
-            cell.eventLink.text = ""
-        } else {
-             cell.eventName.text = list[indexPath.row]
+            cell.eventName.text = filteredData[indexPath.row].name
+            cell.venueDateName.text = filteredData[indexPath.row].venue + " @ " + filteredData[indexPath.row].day + " " + convertMonth(month: filteredData[indexPath.row].month) + " " + filteredData[indexPath.row].hour + ":" + filteredData[indexPath.row].minute
+            cell.eventLink.text = filteredData[indexPath.row].ID
             
-            cell.venueDateName.text = dateList[indexPath.row]
-            cell.eventLink.text = eventIDList[indexPath.row]
-            let url = URL(string: pictureList[indexPath.row])
+            
+            let url = URL(string: filteredData[indexPath.row].image)
+            
+            DispatchQueue.global().async {
+                let data = try? Data(contentsOf: url!)
+                DispatchQueue.main.async {
+                    cell.eventImage.image = UIImage(data: data!)
+                }
+            }
+        } else {
+             cell.eventName.text = EventList[indexPath.row].name
+            cell.venueDateName.text = EventList[indexPath.row].venue + " @ " + EventList[indexPath.row].day + " " + convertMonth(month: EventList[indexPath.row].month) + " " + EventList[indexPath.row].hour + ":" + EventList[indexPath.row].minute
+            cell.eventLink.text = EventList[indexPath.row].ID
+            
+        
+            let url = URL(string: EventList[indexPath.row].image)
             
             DispatchQueue.global().async {
                 let data = try? Data(contentsOf: url!)
@@ -224,23 +258,23 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        
         if searchBar.text == nil {
             isSearching = false
+            filteredData = EventList
             view.endEditing(true)
             tableView.reloadData()
         } else if searchBar.text == "" {
             isSearching = false
+            filteredData = EventList
             view.endEditing(true)
             tableView.reloadData()
         } else {
         isSearching = true
 
-            filteredData = list.filter({ (list: String) -> Bool in
-                if list.contains(searchBar.text!) {
-                    return true
-                } else {
-                    return false
-                }
+            filteredData = EventList.filter({ (mod) -> Bool in
+                return mod.name.lowercased().contains(searchBar.text!.lowercased()) || mod.venue.lowercased().contains(searchBar.text!.lowercased())
             })
             tableView.reloadData()
         }
@@ -248,10 +282,10 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if(isSearching){
-            selectedID = filteredData[indexPath.row]
+            selectedID = filteredData[indexPath.row].ID
         } else {
 
-        selectedID = eventIDList[indexPath.row]
+        selectedID = EventList[indexPath.row].ID
         }
     }
     

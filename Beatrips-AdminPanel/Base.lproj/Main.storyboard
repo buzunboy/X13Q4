@@ -8,7 +8,6 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
         <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
-        <capability name="Segues with Peek and Pop" minToolsVersion="7.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -160,10 +159,7 @@
                                     <outlet property="genresLabel" destination="Jrk-pb-JsL" id="mnd-rK-6Lr"/>
                                     <outlet property="statusLabel" destination="oUe-pC-c17" id="EyF-cD-pdq"/>
                                     <outlet property="venueDateName" destination="oDu-wr-jTO" id="XPS-h9-Cnb"/>
-                                    <segue destination="uey-YK-50j" kind="show" id="yud-pk-aZG">
-                                        <segue key="commit" inheritsFrom="parent" id="iUl-4r-9J8"/>
-                                        <segue key="preview" inheritsFrom="commit" id="jtV-Fo-GuF"/>
-                                    </segue>
+                                    <segue destination="uey-YK-50j" kind="show" id="yud-pk-aZG"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -173,6 +169,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Events" id="bM5-ee-NFr"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics" barStyle="black"/>
                     <connections>
                         <outlet property="searchBar" destination="OwU-4S-Md8" id="dkD-hC-flj"/>
                         <outlet property="tableList" destination="Gxu-cv-zXn" id="n4j-LT-88l"/>
@@ -401,22 +398,27 @@
         <scene sceneID="ubc-tl-WZU">
             <objects>
                 <navigationController id="uey-YK-50j" sceneMemberID="viewController">
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics" barStyle="black"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="6e7-0w-Sg5">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" barStyle="black" id="zCg-we-VdO">
+                        <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="gqg-Ex-pcm" kind="relationship" relationship="rootViewController" id="Net-vB-1vC"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="weg-Dr-g8O" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3966" y="-905"/>
+            <point key="canvasLocation" x="3070" y="-1707"/>
         </scene>
         <!--Event Detail Table View Controller-->
         <scene sceneID="qwu-T9-IMe">
             <objects>
-                <tableViewController automaticallyAdjustsScrollViewInsets="NO" id="gqg-Ex-pcm" customClass="EventDetailTableViewController" customModule="Beatrips_AdminPanel" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="EventDetailTableViewController" automaticallyAdjustsScrollViewInsets="NO" id="gqg-Ex-pcm" customClass="EventDetailTableViewController" customModule="Beatrips_AdminPanel" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="Zi1-gI-g1A">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -893,7 +895,7 @@
                         <outlet property="ticketLink" destination="93B-Vo-NT2" id="tP9-ng-hgg"/>
                         <outlet property="venueNameField" destination="JtQ-CG-DaM" id="oMI-Rk-629"/>
                         <outlet property="yearLabel" destination="vlX-Pr-aaF" id="7ub-J3-D4F"/>
-                        <segue destination="BgC-tG-3WY" kind="show" identifier="goBack" id="YTB-yv-4eD"/>
+                        <segue destination="49e-Tb-3d3" kind="show" identifier="goBack" id="YsH-Cu-34e"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Go2-Cl-ltA" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -903,14 +905,15 @@
                     </connections>
                 </swipeGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="4861.6000000000004" y="-905.3973013493254"/>
+            <point key="canvasLocation" x="3070" y="-2702"/>
         </scene>
         <!--Item-->
         <scene sceneID="Rwb-Na-0Fr">
             <objects>
                 <navigationController id="GvY-EW-Llq" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="SCz-oO-Oph"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="YIf-mE-oB4">
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="black" prompted="NO"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" barStyle="black" id="YIf-mE-oB4">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1044,8 +1047,8 @@
         <scene sceneID="yl2-sM-qoP">
             <objects>
                 <tabBarController id="49e-Tb-3d3" sceneMemberID="viewController">
-                    <nil key="simulatedBottomBarMetrics"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" id="W28-zg-YXA">
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics" barStyle="black"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" barStyle="black" id="W28-zg-YXA">
                         <rect key="frame" x="0.0" y="975" width="768" height="49"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -1066,7 +1069,6 @@
         <image name="second" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="YTB-yv-4eD"/>
-        <segue reference="yud-pk-aZG"/>
+        <segue reference="YsH-Cu-34e"/>
     </inferredMetricsTieBreakers>
 </document>

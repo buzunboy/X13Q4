@@ -41,6 +41,8 @@ class EventDetailTableViewController: UITableViewController {
     var ref = Database.database().reference()
     var imageFrame = UIImageView()
     var imageS = UIImage()
+    var keyboardDone = UIToolbar()
+    var keyBoardHeight: CGFloat = 0
     
     @IBOutlet weak var descriptionTextBottomConstraint: NSLayoutConstraint!
     
@@ -51,7 +53,9 @@ class EventDetailTableViewController: UITableViewController {
     }
     
     @IBAction func swipedLeft(_ sender: Any) {
+        
         self.performSegue(withIdentifier: "goBack", sender: self)
+        
     }
     var list: [String] = []
     var navBar: UINavigationBar!
@@ -59,17 +63,61 @@ class EventDetailTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // self.tableView.contentInset = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
+        setNavigationBar(isComeFromViewDidAppear: false)
+        getInfo()
+
+        //view.addGestureRecognizer(tap)
+        keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillShow(notification:)), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillHide(notification:)), name: .UIKeyboardWillHide, object: nil)
+        // Uncomment the following line to preserve selection between presentations
+        // self.clearsSelectionOnViewWillAppear = false
+        
+        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        setNavigationBar(isComeFromViewDidAppear: true)
+    }
+    
+    
+    func keyBoardWillShow(notification: NSNotification) {
+        //handle appearing of keyboard here
+        let userInfo:NSDictionary = notification.userInfo! as NSDictionary
+        let keyboardFrame:NSValue = userInfo.value(forKey: UIKeyboardFrameEndUserInfoKey) as! NSValue
+        let keyboardRectangle = keyboardFrame.cgRectValue
+        var items = [UIBarButtonItem]()
+        let doneButton = UIBarButtonItem(title: "Done", style: .done, target: nil, action: "dismissKeyboard")
+        items.append(doneButton)
+        keyBoardHeight = keyboardRectangle.height
+        
+        keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - keyBoardHeight - 44 + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
+        keyboardDone.items = items
+        // keyboardDone.backgroundColor = UIColor.red
+        self.view.addSubview(keyboardDone)
+    }
+    
+    func keyBoardWillHide(notification: NSNotification) {
+        //handle dismiss of keyboard here
+        keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
+        keyboardDone.removeFromSuperview()
+    }
+    
+    
+    func setNavigationBar(isComeFromViewDidAppear: Bool){
+        if(isComeFromViewDidAppear){
+            navBar.removeFromSuperview()
+        }
+        
         self.extendedLayoutIncludesOpaqueBars = true
         extendedLayoutIncludesOpaqueBars = true
         tableView.bounces = true
-      
-       // self.view.addSubview(imageFrame)
         
         
         let selectionView = UIView()
         UITableViewCell.appearance().selectedBackgroundView = selectionView
         self.navigationController?.navigationBar.isHidden = true
-        self.navigationController?.isToolbarHidden = true
         
         statusFrame = UIView(frame:     CGRect(x: 0, y: self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 20))
         navBar = UINavigationBar(frame: CGRect(x: 0, y: self.tableView.contentOffset.y + 20, width: UIScreen.main.bounds.width, height: 44))
@@ -82,6 +130,7 @@ class EventDetailTableViewController: UITableViewController {
             let approvedTitle = (approvedTitleDecider == "0") ? "Approve" : "Update"
             let approveItem = UIBarButtonItem(title: approvedTitle, style: .done, target: nil, action: Selector("approveEvent"))
             self.navBar.isTranslucent = true
+            
             self.view.addSubview(self.navBar)
             self.view.addSubview(self.statusFrame)
             let navItem = UINavigationItem(title: "")
@@ -91,13 +140,6 @@ class EventDetailTableViewController: UITableViewController {
             self.navBar.setItems([navItem], animated: false)
             
         })
-        
-        getInfo()
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-        
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
     func getInfo(){
@@ -202,17 +244,19 @@ class EventDetailTableViewController: UITableViewController {
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         if(self.tableView.contentOffset.y <= 0){
-           
+            
             self.imageFrame.removeFromSuperview()
             self.imageFrame = UIImageView(frame: (CGRect(x: 0, y: self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 170 - self.tableView.contentOffset.y)))
-            //self.imageFrame.image = UIImage(data: datas!)
             self.imageFrame.image = self.imageS
             self.imageFrame.contentMode = .scaleAspectFill
             self.imageFrame.clipsToBounds = true
             
             self.view.insertSubview(self.imageFrame, at: 2)
-
+            
         }
+        
+        keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - keyBoardHeight - 44 + self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
+        
         
         navBar.frame = CGRect(x: 0, y: self.tableView.contentOffset.y + 20, width: UIScreen.main.bounds.width, height: 44)
         statusFrame.frame = CGRect(x: 0, y: self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 20)
@@ -237,22 +281,6 @@ class EventDetailTableViewController: UITableViewController {
                 self.navigationController?.navigationBar.barStyle = .default
             })
         }
-        
-        let currentY = self.tableView.contentOffset.y
-        let currentBottomY = self.tableView.frame.size.height + currentY
-        if currentY > lastY {
-            //"scrolling down"
-            tableView.bounces = true
-        } else {
-            //"scrolling up"
-            // Check that we are not in bottom bounce
-            if currentBottomY < self.tableView.contentSize.height + self.tableView.contentInset.bottom {
-                tableView.bounces = true
-                
-                
-            }
-        }
-        lastY = self.tableView.contentOffset.y
         
         
     }
@@ -338,6 +366,10 @@ class EventDetailTableViewController: UITableViewController {
     @IBAction func deleteEvent(_ sender: Any) {
         let deleteDictionary = ["isApproved":"0"]
         ref.child("Events").child(selectedID).updateChildValues(deleteDictionary)
+    }
+    
+    func dismissKeyboard(){
+        view.endEditing(true)
     }
     /*
      override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

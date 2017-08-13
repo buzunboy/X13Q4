@@ -23,6 +23,7 @@ class EventDetailViewController: UIViewController {
         self.navigationController?.view.backgroundColor = UIColor.clear
         self.navigationController?.navigationBar.backgroundColor = UIColor.clear
         
+        
 
         // Do any additional setup after loading the view.
     }

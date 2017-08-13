@@ -18,6 +18,7 @@
 		B0397EFC1F3DCC8F000F1F53 /* EventDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0397EFB1F3DCC8F000F1F53 /* EventDetailTableViewController.swift */; };
 		B049FC301F385501002081A1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B049FC2F1F385501002081A1 /* GoogleService-Info.plist */; };
 		B049FC321F38592A002081A1 /* EventDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B049FC311F38592A002081A1 /* EventDetailViewController.swift */; };
+		B0864CE51F406A70008A688C /* EventModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0864CE41F406A70008A688C /* EventModel.swift */; };
 		B0A5A0DC1F360DF900FD546A /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0A5A0D71F360DF900FD546A /* Bolts.framework */; };
 		B0A5A0DD1F360DF900FD546A /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0A5A0D81F360DF900FD546A /* FBSDKCoreKit.framework */; };
 		B0A5A0DE1F360DF900FD546A /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0A5A0D91F360DF900FD546A /* FBSDKLoginKit.framework */; };
@@ -41,6 +42,7 @@
 		B0397EFB1F3DCC8F000F1F53 /* EventDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventDetailTableViewController.swift; path = ViewControllers/EventDetailTableViewController.swift; sourceTree = "<group>"; };
 		B049FC2F1F385501002081A1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B049FC311F38592A002081A1 /* EventDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventDetailViewController.swift; path = ViewControllers/EventDetailViewController.swift; sourceTree = "<group>"; };
+		B0864CE41F406A70008A688C /* EventModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventModel.swift; path = "Event Model/EventModel.swift"; sourceTree = "<group>"; };
 		B0A5A0D71F360DF900FD546A /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		B0A5A0D81F360DF900FD546A /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		B0A5A0D91F360DF900FD546A /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				B0A5A0E31F36153A00FD546A /* Beatrips-AdminPanel.entitlements */,
 				B00C97341F32487500DF4406 /* AppDelegate.swift */,
 				B00C974A1F3249C600DF4406 /* EventsTableViewController.swift */,
+				B0864CE41F406A70008A688C /* EventModel.swift */,
 				B0A5A0E61F374A5C00FD546A /* monthConverter.swift */,
 				B00C97361F32487500DF4406 /* FirstViewController.swift */,
 				B00C97381F32487500DF4406 /* SecondViewController.swift */,
@@ -258,6 +261,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B00C97391F32487500DF4406 /* SecondViewController.swift in Sources */,
+				B0864CE51F406A70008A688C /* EventModel.swift in Sources */,
 				B00C97351F32487500DF4406 /* AppDelegate.swift in Sources */,
 				B00C974B1F3249C600DF4406 /* EventsTableViewController.swift in Sources */,
 				B0397EFC1F3DCC8F000F1F53 /* EventDetailTableViewController.swift in Sources */,
