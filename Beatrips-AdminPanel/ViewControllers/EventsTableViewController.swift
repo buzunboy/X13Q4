@@ -29,8 +29,7 @@ class cellClass: UITableViewCell{
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var editorChoiceLabel: UILabel!
     @IBOutlet weak var statusLabel: UILabel!
-    
-    
+
     @IBOutlet weak var approveButtonView: UIButton!
     
     
@@ -57,14 +56,23 @@ class cellClass: UITableViewCell{
     
 }
 
-class EventsTableViewController: UITableViewController {
+class EventsTableViewController: UITableViewController, UISearchBarDelegate {
     
     @IBOutlet var tableList: UITableView!
+    @IBOutlet weak var searchBar: UISearchBar!
+    
+    var filteredData = [String]()
+    var isSearching = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.navigationController?.navigationBar.isHidden = false
         self.navigationItem.setHidesBackButton(true, animated: false)
+        
+        searchBar.delegate = self
+        searchBar.returnKeyType = UIReturnKeyType.done
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -103,6 +111,7 @@ class EventsTableViewController: UITableViewController {
                             let eventDictionary = event as? NSDictionary
                             let eventID = eventDictionary?["id"] as! String
                             let placeData = eventDictionary?["place"] as? NSDictionary
+                            let placeLocation = placeData?["location"] as? NSDictionary
                             let pictureData = eventDictionary?["cover"] as? NSDictionary
                             
                             let eventName = eventDictionary?["name"] as! String
@@ -150,7 +159,9 @@ class EventsTableViewController: UITableViewController {
                                         "isApproved": "0",
                                         "likeCount":"0",
                                         "seenCount":"0",
-                                        "commentCount":"0"
+                                        "commentCount":"0",
+                                        "Latitude":placeLocation?["latitude"],
+                                        "Longitude":placeLocation?["longitude"]
                                     ] as [String : Any]
                                     ref.child("Events").child(eventID).updateChildValues(nonApproved)
                                 }
@@ -177,31 +188,74 @@ class EventsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
+        if isSearching {
+            return filteredData.count
+        } else {
         return list.count
+        }
     }
     
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "eventCell", for: indexPath) as! cellClass
         
-        cell.eventName.text = list[indexPath.row]
-        cell.venueDateName.text = dateList[indexPath.row]
-        cell.eventLink.text = eventIDList[indexPath.row]
-        let url = URL(string: pictureList[indexPath.row])
-        
-        DispatchQueue.global().async {
-            let data = try? Data(contentsOf: url!)
-            DispatchQueue.main.async {
-                cell.eventImage.image = UIImage(data: data!)
+        if(isSearching){
+            cell.eventName.text = filteredData[indexPath.row]
+            cell.venueDateName.text = ""
+            cell.eventImage.image = UIImage()
+            cell.eventLink.text = ""
+        } else {
+             cell.eventName.text = list[indexPath.row]
+            
+            cell.venueDateName.text = dateList[indexPath.row]
+            cell.eventLink.text = eventIDList[indexPath.row]
+            let url = URL(string: pictureList[indexPath.row])
+            
+            DispatchQueue.global().async {
+                let data = try? Data(contentsOf: url!)
+                DispatchQueue.main.async {
+                    cell.eventImage.image = UIImage(data: data!)
+                }
             }
         }
         
         return cell
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedID = eventIDList[indexPath.row]
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text == nil {
+            isSearching = false
+            view.endEditing(true)
+            tableView.reloadData()
+        } else if searchBar.text == "" {
+            isSearching = false
+            view.endEditing(true)
+            tableView.reloadData()
+        } else {
+        isSearching = true
+
+            filteredData = list.filter({ (list: String) -> Bool in
+                if list.contains(searchBar.text!) {
+                    return true
+                } else {
+                    return false
+                }
+            })
+            tableView.reloadData()
+        }
     }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if(isSearching){
+            selectedID = filteredData[indexPath.row]
+        } else {
+
+        selectedID = eventIDList[indexPath.row]
+        }
+    }
+    
+   
     
     /*
      // Override to support conditional editing of the table view.

@@ -28,8 +28,6 @@ class EventDetailTableViewController: UITableViewController {
     @IBOutlet weak var hourLabel: UITextField!
     @IBOutlet weak var minuteLabel: UITextField!
     
-    
-    
     @IBOutlet weak var isApprovedLabel: UILabel!
     @IBOutlet weak var seenCountLabel: UITextField!
     @IBOutlet weak var likedCountLabel: UITextField!
@@ -39,6 +37,10 @@ class EventDetailTableViewController: UITableViewController {
     @IBOutlet weak var seeMore: UIButton!
     
     var selectedRow = -1
+    var lastY: CGFloat = 0.0
+    var ref = Database.database().reference()
+    var imageFrame = UIImageView()
+    var imageS = UIImage()
     
     @IBOutlet weak var descriptionTextBottomConstraint: NSLayoutConstraint!
     
@@ -56,30 +58,41 @@ class EventDetailTableViewController: UITableViewController {
     var statusFrame: UIView!
     override func viewDidLoad() {
         super.viewDidLoad()
+        // self.tableView.contentInset = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
+        self.extendedLayoutIncludesOpaqueBars = true
+        extendedLayoutIncludesOpaqueBars = true
+        tableView.bounces = true
+      
+       // self.view.addSubview(imageFrame)
+        
         
         let selectionView = UIView()
         UITableViewCell.appearance().selectedBackgroundView = selectionView
-        
         self.navigationController?.navigationBar.isHidden = true
+        self.navigationController?.isToolbarHidden = true
+        
         statusFrame = UIView(frame:     CGRect(x: 0, y: self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 20))
         navBar = UINavigationBar(frame: CGRect(x: 0, y: self.tableView.contentOffset.y + 20, width: UIScreen.main.bounds.width, height: 44))
         navBar.setBackgroundImage(UIImage(), for: .default)
         navBar.shadowImage = UIImage()
-        let backItem = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: Selector("goBack"))
-        let approveItem = UIBarButtonItem(title: "Approve", style: .done, target: nil, action: Selector("approveEvent"))
-        navBar.isTranslucent = true
         
-        
-        self.view.addSubview(navBar)
-        self.view.addSubview(statusFrame)
-        let navItem = UINavigationItem(title: "")
-        navItem.leftBarButtonItem = backItem
-        navItem.rightBarButtonItem = approveItem
-        
-        navBar.setItems([navItem], animated: false)
+        ref.child("Events").child(selectedID).observe(.value, with: { (snapshot) in
+            let approvedTitleDecider = snapshot.childSnapshot(forPath: "isApproved").value as! String
+            let backItem = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: Selector("goBack"))
+            let approvedTitle = (approvedTitleDecider == "0") ? "Approve" : "Update"
+            let approveItem = UIBarButtonItem(title: approvedTitle, style: .done, target: nil, action: Selector("approveEvent"))
+            self.navBar.isTranslucent = true
+            self.view.addSubview(self.navBar)
+            self.view.addSubview(self.statusFrame)
+            let navItem = UINavigationItem(title: "")
+            navItem.leftBarButtonItem = backItem
+            navItem.rightBarButtonItem = approveItem
+            
+            self.navBar.setItems([navItem], animated: false)
+            
+        })
         
         getInfo()
-        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -89,26 +102,30 @@ class EventDetailTableViewController: UITableViewController {
     
     func getInfo(){
         
-        let ref = Database.database().reference()
         
         ref.child("Events").child(selectedID).observe(.value, with: { (snapshot) in
             let eventInfo = [
-                "EventName": snapshot.childSnapshot(forPath: "EventName").value as! String,
-                "VenueName": snapshot.childSnapshot(forPath: "VenueName").value as! String,
-                "EventImage": snapshot.childSnapshot(forPath: "EventImage").value as! String,
-                "VenueID": snapshot.childSnapshot(forPath: "VenueID").value as! String,
-                "Details": snapshot.childSnapshot(forPath: "Details").value as! String,
-                "TicketLink": snapshot.childSnapshot(forPath: "TicketLink").value as? String,
-                "Day": snapshot.childSnapshot(forPath: "Day").value as! String,
-                "Month": snapshot.childSnapshot(forPath: "Month").value as! String,
-                "Year": snapshot.childSnapshot(forPath: "Year").value as! String,
-                "Hour": snapshot.childSnapshot(forPath: "Hour").value as! String,
-                "Minutes": snapshot.childSnapshot(forPath: "Minutes").value as! String,
-                "isApproved": snapshot.childSnapshot(forPath: "isApproved").value as! String,
-                "likeCount": snapshot.childSnapshot(forPath: "likeCount").value as! String,
-                "seenCount": snapshot.childSnapshot(forPath: "seenCount").value as! String,
+                "EventName":    snapshot.childSnapshot(forPath: "EventName").value as! String,
+                "VenueName":    snapshot.childSnapshot(forPath: "VenueName").value as! String,
+                "EventImage":   snapshot.childSnapshot(forPath: "EventImage").value as! String,
+                "VenueID":      snapshot.childSnapshot(forPath: "VenueID").value as! String,
+                "Details":      snapshot.childSnapshot(forPath: "Details").value as! String,
+                "TicketLink":   snapshot.childSnapshot(forPath: "TicketLink").value as? String,
+                "Day":          snapshot.childSnapshot(forPath: "Day").value as! String,
+                "Month":        snapshot.childSnapshot(forPath: "Month").value as! String,
+                "Year":         snapshot.childSnapshot(forPath: "Year").value as! String,
+                "Hour":         snapshot.childSnapshot(forPath: "Hour").value as! String,
+                "Minutes":      snapshot.childSnapshot(forPath: "Minutes").value as! String,
+                "isApproved":   snapshot.childSnapshot(forPath: "isApproved").value as! String,
+                "likeCount":    snapshot.childSnapshot(forPath: "likeCount").value as! String,
+                "seenCount":    snapshot.childSnapshot(forPath: "seenCount").value as! String,
                 "commentCount": snapshot.childSnapshot(forPath: "commentCount").value as! String,
+                
                 ] as [String:Any]
+            let locationDictionary = [
+                "Latitude":     snapshot.childSnapshot(forPath: "Latitude").value as? Double ?? 0,
+                "Longitude":    snapshot.childSnapshot(forPath: "Longitude").value as? Double ?? 0
+                ] as! [String:Double]
             self.eventNameField.text = eventInfo["EventName"] as? String
             self.venueNameField.text = eventInfo["VenueName"] as? String
             self.descriptionText.text = eventInfo["Details"] as? String
@@ -121,6 +138,14 @@ class EventDetailTableViewController: UITableViewController {
             
             let isApproved = eventInfo["isApproved"] as? String
             self.isApprovedLabel.text = (isApproved == "1") ? "YES" : "NO"
+            
+            let annotation = MKPointAnnotation()
+            let latitude = Double(locationDictionary["Latitude"]!)
+            let longitude = Double(locationDictionary["Longitude"]!)
+            annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            self.mapView.addAnnotation(annotation)
+            let region = MKCoordinateRegion(center: annotation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005))
+            self.mapView.setRegion(region, animated: true)
             
             self.likedCountLabel.text = String(describing: eventInfo["likeCount"]!)
             self.seenCountLabel.text = String(describing: eventInfo["seenCount"]!)
@@ -138,80 +163,11 @@ class EventDetailTableViewController: UITableViewController {
                 let data = try? Data(contentsOf: url!)
                 DispatchQueue.main.async {
                     self.eventImage.image = UIImage(data: data!)
-                    self.hiddenImageURL.text = eventInfo["EventImage"] as? String
+                    self.imageS = UIImage(data: data!)!
                 }
             }
-            
+            self.hiddenImageURL.text = eventInfo["EventImage"] as? String
         })
-        
-        
-        /* if FBSDKAccessToken.current() != nil {
-         let request: FBSDKGraphRequest  = FBSDKGraphRequest(graphPath: selectedID, parameters: ["fields": "attending_count,category,cover,description,interested_count,name,owner,picture,ticket_uri,place,start_time"])
-         request.start { (connection, results, error) in
-         
-         // Something went wrong
-         if (error != nil) {
-         print(error as Any)
-         }
-         print(results)
-         
-         if let eventData = results as? NSDictionary{
-         let placeData = eventData["place"] as? NSDictionary
-         
-         DispatchQueue.global().async {
-         DispatchQueue.main.async {
-         
-         self.eventName.text = eventData["name"] as? String
-         self.descriptionText.text = eventData["description"] as? String
-         self.ticketLink.text = eventData["ticket_uri"] as? String
-         self.venueName.text = placeData?["name"] as? String
-         
-         }
-         }
-         
-         let pictureData = eventData["cover"] as? NSDictionary
-         let pictureURL: String = pictureData?["source"] as! String
-         
-         let url = URL(string: pictureURL)
-         
-         DispatchQueue.global().async {
-         let data = try? Data(contentsOf: url!)
-         DispatchQueue.main.async {
-         self.eventImage.image = UIImage(data: data!)
-         self.hiddenImageURL.text = pictureURL
-         }
-         
-         
-         let placeLocationData = placeData?["location"] as? NSDictionary
-         let annotation = MKPointAnnotation()
-         let latitude = placeLocationData?["latitude"] as! Double
-         let longitude = placeLocationData?["longitude"] as! Double
-         annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-         self.mapView.addAnnotation(annotation)
-         let region: MKCoordinateRegion = MKCoordinateRegion(center: annotation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005))
-         self.mapView.setRegion(region, animated: true)
-         
-         DispatchQueue.global().async {
-         let startTime = eventData["start_time"] as! String
-         var dateArray = startTime._split(separator: "T")
-         var splitDate = dateArray[0]._split(separator: "-")
-         var timeArray = dateArray[1]._split(separator: ":")
-         
-         DispatchQueue.main.async {
-         self.yearLabel.text = splitDate[0]
-         self.monthLabel.text = splitDate[1]
-         self.dayLabel.text = splitDate[2]
-         self.hourLabel.text = timeArray[0]
-         self.minuteLabel.text = timeArray[1]
-         }
-         }
-         
-         
-         }
-         
-         }
-         }
-         } */
     }
     
     
@@ -220,35 +176,44 @@ class EventDetailTableViewController: UITableViewController {
     }
     
     func approveEvent(){
-        let ref = Database.database().reference()
-        
-        ref.child("Events").child(selectedID).observe(.value) { (snapshot) in
-            if (snapshot.childSnaphot(forpath: "isApproved") == "1"){
-                
-            }
-            
-        }
         
         let addedDictionary = [
-            "EventName":eventNameField.text ?? "",
-            "VenueName":venueNameField.text ?? "",
-            "Details": descriptionText.text ?? "",
-            "TicketLink": ticketLink.text ?? "",
-            "Day": dayLabel.text ?? "",
-            "Month":monthLabel.text ?? "",
-            "Year":yearLabel.text ?? "",
-            "Hour":hourLabel.text ?? "",
-            "Minutes":minuteLabel.text ?? "",
-            "EventImage":hiddenImageURL.text ?? "",
-            "commentCount":commentCountLabel.text ?? "",
-            "likeCount":likedCountLabel.text ?? "",
-            "seenCount":seenCountLabel.text ?? "",
-            "isApproved":"1",
+            "EventName":self.eventNameField.text,
+            "VenueName":self.venueNameField.text,
+            "Details": self.descriptionText.text,
+            "TicketLink": self.ticketLink.text,
+            "Day": self.dayLabel.text!,
+            "Month":self.monthLabel.text!,
+            "Year":self.yearLabel.text!,
+            "Hour":self.hourLabel.text!,
+            "Minutes":self.minuteLabel.text!,
+            "EventImage":self.hiddenImageURL.text!,
+            "commentCount":self.commentCountLabel.text!,
+            "likeCount":self.likedCountLabel.text!,
+            "seenCount":self.seenCountLabel.text!,
+            "isApproved":"1"
             ] as [String : Any]
         ref.child("Events").child(selectedID).updateChildValues(addedDictionary)
+        
+        self.navBar.topItem?.rightBarButtonItem?.title = "Approved"
+        
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        if(self.tableView.contentOffset.y <= 0){
+           
+            self.imageFrame.removeFromSuperview()
+            self.imageFrame = UIImageView(frame: (CGRect(x: 0, y: self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 170 - self.tableView.contentOffset.y)))
+            //self.imageFrame.image = UIImage(data: datas!)
+            self.imageFrame.image = self.imageS
+            self.imageFrame.contentMode = .scaleAspectFill
+            self.imageFrame.clipsToBounds = true
+            
+            self.view.insertSubview(self.imageFrame, at: 2)
+
+        }
+        
         navBar.frame = CGRect(x: 0, y: self.tableView.contentOffset.y + 20, width: UIScreen.main.bounds.width, height: 44)
         statusFrame.frame = CGRect(x: 0, y: self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 20)
         if(self.tableView.contentOffset.y >= 140){
@@ -259,7 +224,9 @@ class EventDetailTableViewController: UITableViewController {
                 topView.textColor = UIColor.white
                 topView.text = self.eventNameField.text
                 self.navBar.topItem?.titleView = topView
-
+                self.navigationController?.navigationBar.barStyle = .blackTranslucent
+                
+                
             })
             
         } else {
@@ -267,8 +234,26 @@ class EventDetailTableViewController: UITableViewController {
                 self.statusFrame.backgroundColor = UIColor.clear
                 self.navBar.backgroundColor = UIColor.clear
                 self.navBar.topItem?.titleView = UIView()
+                self.navigationController?.navigationBar.barStyle = .default
             })
         }
+        
+        let currentY = self.tableView.contentOffset.y
+        let currentBottomY = self.tableView.frame.size.height + currentY
+        if currentY > lastY {
+            //"scrolling down"
+            tableView.bounces = true
+        } else {
+            //"scrolling up"
+            // Check that we are not in bottom bounce
+            if currentBottomY < self.tableView.contentSize.height + self.tableView.contentInset.bottom {
+                tableView.bounces = true
+                
+                
+            }
+        }
+        lastY = self.tableView.contentOffset.y
+        
         
     }
     
@@ -329,27 +314,31 @@ class EventDetailTableViewController: UITableViewController {
             self.tableView.beginUpdates()
             self.tableView.endUpdates()
         }
-       
+        
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return 9
     }
     
-
+    
     override func  tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
         
         for x in 1...8 {
             let cell = tableView.cellForRow(at: IndexPath(row: x, section: 0))
-                cell?.contentView.backgroundColor = UIColor.clear
-                cell?.backgroundColor = UIColor.clear
+            cell?.contentView.backgroundColor = UIColor.clear
+            cell?.backgroundColor = UIColor.clear
             cell?.selectedBackgroundView?.backgroundColor = UIColor.white
         }
-       
+        
         
     }
     
+    @IBAction func deleteEvent(_ sender: Any) {
+        let deleteDictionary = ["isApproved":"0"]
+        ref.child("Events").child(selectedID).updateChildValues(deleteDictionary)
+    }
     /*
      override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
      let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
