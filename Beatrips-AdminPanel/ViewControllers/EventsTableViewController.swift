@@ -26,18 +26,7 @@ class cellClass: UITableViewCell{
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var editorChoiceLabel: UILabel!
     @IBOutlet weak var statusLabel: UILabel!
-    @IBOutlet weak var approveButtonView: UIButton!
     
-    
-    
-    @IBAction func approveButton(_ sender: Any) {
-        
-        let addedDictionary = [
-            "EventName":eventName.text,
-            "DateAndVenue":venueDateName.text
-        ]
-        ref.child("Events").child(eventLink.text!).setValue(addedDictionary)
-    }
     
 }
 
@@ -59,6 +48,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         
         searchBar.delegate = self
         searchBar.returnKeyType = UIReturnKeyType.done
+        searchBar.placeholder = "Search Event"
         
         if( traitCollection.forceTouchCapability == .available){
             
@@ -66,7 +56,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             
         }
         refreshControls = UIRefreshControl()
-        refreshControls.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
         refreshControls.addTarget(self, action: "refresh", for: UIControlEvents.valueChanged)
         tableView.addSubview(refreshControls)
         // Uncomment the following line to preserve selection between presentations
@@ -101,6 +91,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     
     func refresh(){
         getList()
+        refreshControls.attributedTitle = NSAttributedString(string: "Let me check")
     }
     
     func getList(){
@@ -131,22 +122,12 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                             let eventName = eventDictionary?["name"] as! String
                             let eventDate = eventDictionary?["start_time"] as! String
                             var dateArray = eventDate._split(separator: "-")
-                            let month = dateArray[1]
                             let dayArray = dateArray[2]._split(separator: "T")
-                            let date = dayArray[0]
                             var timeArray = dayArray[1]._split(separator: ":")
-                            let hour = timeArray[0]
-                            let minutes = timeArray[1]
-                            let pictureDatas = eventDictionary?["cover"] as? NSDictionary
-                            let pictureURL = pictureDatas?["source"] as! String
-                            let venuesData = eventDictionary?["place"] as? NSDictionary
-                            let venueName = venuesData?["name"] as? String
-                            let convertedDate = String(date) + " " + convertMonth(month: month) + " " + String(hour) + ":" + String(minutes)
-                            
+
                             let startTime = eventDictionary?["start_time"] as! String
                             var dateArrays = startTime._split(separator: "T")
                             var splitDate = dateArrays[0]._split(separator: "-")
-                            let timeArrays = dateArrays[1]._split(separator: ":")
                             
                             self.EventList.append(EventModel(name: eventName, ID: eventID, venue: placeData!["name"] as! String, venueID: placeData!["id"] as! String, image: pictureData!["source"] as! String, ticket: eventDictionary!["ticket_uri"] as? String ?? "", descriptionText: eventDictionary!["description"] as! String, day: splitDate[2], month: splitDate[1], year: splitDate[0], hour: timeArray[0], minute: timeArray[1], isApproved: "0", likeCount: "0", seenCount: "0", commentCount: "0", latitude: placeLocation!["latitude"] as? Double ?? 0, longitude: placeLocation!["longitude"] as? Double ?? 0))
                             self.tableView.reloadData()
@@ -157,6 +138,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                         self.EventList.removeFirst(eventCount)
                         self.tableView.reloadData()
                         self.refreshControls.endRefreshing()
+                        self.refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
                     }
                     self.sendToDatabase()
                 }
@@ -171,6 +153,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             ref.child("Events").child(event.ID).observe(.value, with: { (snapshot) in
                 let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
                 if (isApproved != "1"){
+                    event.isApproved = "0"
                     let nonApproved = [
                         "EventName":event.name,
                         "VenueName":event.venue,
@@ -191,6 +174,10 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                         "Longitude":event.longitude
                         ] as [String : Any]
                     ref.child("Events").child(event.ID).updateChildValues(nonApproved)
+                    self.tableView.reloadData()
+                } else {
+                    event.isApproved = "1"
+                    self.tableView.reloadData()
                 }
             })
         }
@@ -227,6 +214,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             cell.eventName.text = filteredData[indexPath.row].name
             cell.venueDateName.text = filteredData[indexPath.row].venue + " @ " + filteredData[indexPath.row].day + " " + convertMonth(month: filteredData[indexPath.row].month) + " " + filteredData[indexPath.row].hour + ":" + filteredData[indexPath.row].minute
             cell.eventLink.text = filteredData[indexPath.row].ID
+            cell.statusLabel.text = filteredData[indexPath.row].isApproved != "1" ? "Unapproved" : "Approved"
             
             let url = URL(string: filteredData[indexPath.row].image)
             
@@ -241,6 +229,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             cell.eventName.text = EventList[indexPath.row].name
             cell.venueDateName.text = EventList[indexPath.row].venue + " @ " + EventList[indexPath.row].day + " " + convertMonth(month: EventList[indexPath.row].month) + " " + EventList[indexPath.row].hour + ":" + EventList[indexPath.row].minute
             cell.eventLink.text = EventList[indexPath.row].ID
+            cell.statusLabel.text = EventList[indexPath.row].isApproved != "1" ? "Unapproved" : "Approved"
             
             let url = URL(string: EventList[indexPath.row].image)
             
