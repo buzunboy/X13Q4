@@ -48,6 +48,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         
         searchBar.delegate = self
         searchBar.returnKeyType = UIReturnKeyType.done
+        searchBar.placeholder = "Search Event"
         
         if( traitCollection.forceTouchCapability == .available){
             
@@ -55,7 +56,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             
         }
         refreshControls = UIRefreshControl()
-        refreshControls.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
         refreshControls.addTarget(self, action: "refresh", for: UIControlEvents.valueChanged)
         tableView.addSubview(refreshControls)
         // Uncomment the following line to preserve selection between presentations
@@ -90,6 +91,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     
     func refresh(){
         getList()
+        refreshControls.attributedTitle = NSAttributedString(string: "Let me check")
     }
     
     func getList(){
@@ -136,6 +138,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                         self.EventList.removeFirst(eventCount)
                         self.tableView.reloadData()
                         self.refreshControls.endRefreshing()
+                        self.refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
                     }
                     self.sendToDatabase()
                 }
