@@ -17,7 +17,7 @@ var venueLists: [String] = ["8087014348"]
 var pictureList: [String] = []
 var eventIDList: [String] = []
 var selectedID: String = ""
-var EventList = [EventModel]()
+
 var ref = Database.database().reference()
 
 class cellClass: UITableViewCell{
@@ -61,8 +61,8 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     
     @IBOutlet var tableList: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
-
-    
+    var EventList = [EventModel]()
+    var refreshControls = UIRefreshControl()
     var filteredData = [EventModel]()
     var isSearching = false
     
@@ -80,13 +80,17 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             registerForPreviewing(with: self, sourceView: view)
             
         }
-        
+        refreshControls = UIRefreshControl()
+        refreshControls.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControls.addTarget(self, action: "refresh", for: UIControlEvents.valueChanged)
+        tableView.addSubview(refreshControls)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
+
     override func viewDidAppear(_ animated: Bool) {
         getList()
         self.navigationController?.isNavigationBarHidden = false
@@ -111,10 +115,14 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         
     }
     
+    func refresh(){
+        getList()
+    }
+    
     func getList(){
+        let eventCount = EventList.count
         
-        
-        if FBSDKAccessToken.current() != nil {
+                if FBSDKAccessToken.current() != nil {
             
             for venue in venueLists{
                 let venueEventID = "/" + venue + "/events"
@@ -125,7 +133,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                     if (error != nil) {
                         print(error as Any)
                     }
-                     print(results)
+                     // print(results)
                     
                     if let eventData = results as? NSDictionary{
                         
@@ -139,7 +147,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                             
                             let eventName = eventDictionary?["name"] as! String
                             
-                            eventIDList.append(eventID)
+                            //eventIDList.append(eventID)
                             let eventDate = eventDictionary?["start_time"] as! String
                             var dateArray = eventDate._split(separator: "-")
                             let month = dateArray[1]
@@ -152,51 +160,71 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                             let pictureURL = pictureDatas?["source"] as! String
                             
                             
-                            pictureList.append(pictureURL)
-                            list.append(eventName)
+                            //pictureList.append(pictureURL)
+                            //list.append(eventName)
                             let venuesData = eventDictionary?["place"] as? NSDictionary
                             let venueName = venuesData?["name"] as? String
                             let convertedDate = String(date) + " " + convertMonth(month: month) + " " + String(hour) + ":" + String(minutes)
-                            dateList.append(venueName! + " @ " + convertedDate)
-                            self.tableList.reloadData()
+                            //dateList.append(venueName! + " @ " + convertedDate)
+                            //self.tableList.reloadData()
                             let startTime = eventDictionary?["start_time"] as! String
                             var dateArrays = startTime._split(separator: "T")
                             var splitDate = dateArrays[0]._split(separator: "-")
                             let timeArrays = dateArrays[1]._split(separator: ":")
-                            EventList.append(EventModel(name: eventName, ID: eventID, venue: placeData!["name"] as! String, venueID: placeData!["id"] as! String, image: pictureData!["source"] as! String, ticket: eventDictionary!["ticket_uri"] as? String ?? "", descriptionText: eventDictionary!["description"] as! String, day: splitDate[2], month: splitDate[1], year: splitDate[0], hour: timeArray[0], minute: timeArray[1], isApproved: "0", likeCount: "0", seenCount: "0", commentCount: "0", latitude: String(describing: placeLocation!["latitude"]), longitude: String(describing: placeLocation!["longitude"])))
-
-                            ref.child("Events").child(eventID).observe(.value, with: { (snapshot) in
-                               let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
-                                if (isApproved != "1"){
-                                    let nonApproved = [
-                                        "EventName":eventName,
-                                        "VenueName":placeData?["name"] as? String,
-                                        "EventImage":pictureData?["source"] as? String,
-                                        "TicketLink": eventDictionary?["ticket_uri"] as? String,
-                                        "Details":eventDictionary?["description"] as? String,
-                                        "Day":splitDate[2],
-                                        "Month":splitDate[1],
-                                        "Year":splitDate[0],
-                                        "Hour":timeArray[0],
-                                        "Minutes":timeArray[1],
-                                        "VenueID":placeData?["id"] as? String,
-                                        "isApproved": "0",
-                                        "likeCount":"0",
-                                        "seenCount":"0",
-                                        "commentCount":"0",
-                                        "Latitude":placeLocation?["latitude"],
-                                        "Longitude":placeLocation?["longitude"]
-                                    ] as [String : Any]
-                                    ref.child("Events").child(eventID).updateChildValues(nonApproved)
-                                }
-
-                            })
                             
+                            self.EventList.append(EventModel(name: eventName, ID: eventID, venue: placeData!["name"] as! String, venueID: placeData!["id"] as! String, image: pictureData!["source"] as! String, ticket: eventDictionary!["ticket_uri"] as? String ?? "", descriptionText: eventDictionary!["description"] as! String, day: splitDate[2], month: splitDate[1], year: splitDate[0], hour: timeArray[0], minute: timeArray[1], isApproved: "0", likeCount: "0", seenCount: "0", commentCount: "0", latitude: placeLocation!["latitude"] as? Double ?? 0, longitude: placeLocation!["longitude"] as? Double ?? 0))
+                            self.tableView.reloadData()
+
                         }
                     }
+                    if (eventCount >= 1){
+                        self.EventList.removeFirst(eventCount)
+                        self.tableView.reloadData()
+                        self.refreshControls.endRefreshing()
+                    }
+                    self.sendToDatabase()
                 }
             }
         }
+        
+        
+    }
+    
+    func sendToDatabase() {
+        
+        for event in EventList {
+           
+            ref.child("Events").child(event.ID).observe(.value, with: { (snapshot) in
+                let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
+                if (isApproved != "1"){
+                    let nonApproved = [
+                        "EventName":event.name,
+                        "VenueName":event.venue,
+                        "EventImage":event.image,
+                        "TicketLink": event.ticket,
+                        "Details":event.descriptionText,
+                        "Day":event.day,
+                        "Month":event.month,
+                        "Year":event.year,
+                        "Hour":event.hour,
+                        "Minutes":event.minute,
+                        "VenueID":event.venueID,
+                        "isApproved": "0",
+                        "likeCount":"0",
+                        "seenCount":"0",
+                        "commentCount":"0",
+                        "Latitude":event.latitude,
+                        "Longitude":event.longitude
+                        ] as [String : Any]
+                    ref.child("Events").child(event.ID).updateChildValues(nonApproved)
+                }
+                
+            })
+
+            
+        }
+        
+        
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
