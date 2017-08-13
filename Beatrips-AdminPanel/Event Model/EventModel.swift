@@ -26,10 +26,10 @@ class EventModel: NSObject {
     var likeCount: String = ""
     var seenCount: String = ""
     var commentCount: String = ""
-    var latitude: String = ""
-    var longitude: String = ""
+    var latitude: Double = 0
+    var longitude: Double = 0
     
-    init(name: String, ID: String, venue: String, venueID: String, image: String, ticket: String, descriptionText: String, day: String, month: String, year: String, hour: String, minute: String, isApproved: String, likeCount: String, seenCount: String, commentCount: String, latitude: String, longitude: String) {
+    init(name: String, ID: String, venue: String, venueID: String, image: String, ticket: String, descriptionText: String, day: String, month: String, year: String, hour: String, minute: String, isApproved: String, likeCount: String, seenCount: String, commentCount: String, latitude: Double, longitude: Double) {
         self.name = name
         self.ID = ID
         self.venue = venue
