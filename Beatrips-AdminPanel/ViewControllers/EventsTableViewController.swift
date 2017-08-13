@@ -30,28 +30,31 @@ class cellClass: UITableViewCell{
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var editorChoiceLabel: UILabel!
     @IBOutlet weak var statusLabel: UILabel!
-
+    
     @IBOutlet weak var approveButtonView: UIButton!
     
     
     
     @IBAction func approveButton(_ sender: Any) {
         
-        let addedDictionary = [
-            "EventName":eventName.text,
-            "DateAndVenue":venueDateName.text
-        ]
-        ref.child("Events").child(eventLink.text!).setValue(addedDictionary)
-        
-        if(approvedEvent.contains(eventLink.text!)){
-            approveButtonView.setTitle("Approved", for: .normal)
-            approveButtonView.backgroundColor = UIColor.blue
-        } else {
-            approveButtonView.backgroundColor = UIColor.orange
-            approveButtonView.setTitle("Approves", for: .normal)
-        }
-        approvedEvent.append(eventLink.text!)
-        
+        ref.child("Events").child(eventLink.text!).observe(.value, with: { (snapshot) in
+            
+            if snapshot.childSnapshot(forPath: "isApproved").value as? String != "1" {
+                let addedDictionary = [
+                    "isApproved":"1"
+                ]
+                self.approveButtonView.setTitle("Approve", for: .normal)
+                self.approveButtonView.backgroundColor = UIColor.orange
+                ref.child("Events").child(self.eventLink.text!).updateChildValues(addedDictionary)
+            } else {
+                let addedDictionary = [
+                    "isApproved":"0"
+                ]
+                self.approveButtonView.setTitle("Delete", for: .normal)
+                self.approveButtonView.backgroundColor = UIColor.red
+                ref.child("Events").child(self.eventLink.text!).updateChildValues(addedDictionary)
+            }
+        })
     }
     
     
@@ -61,7 +64,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     
     @IBOutlet var tableList: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
-
+    
     
     var filteredData = [EventModel]()
     var isSearching = false
@@ -125,7 +128,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                     if (error != nil) {
                         print(error as Any)
                     }
-                     print(results)
+                    print(results)
                     
                     if let eventData = results as? NSDictionary{
                         
@@ -164,9 +167,9 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                             var splitDate = dateArrays[0]._split(separator: "-")
                             let timeArrays = dateArrays[1]._split(separator: ":")
                             EventList.append(EventModel(name: eventName, ID: eventID, venue: placeData!["name"] as! String, venueID: placeData!["id"] as! String, image: pictureData!["source"] as! String, ticket: eventDictionary!["ticket_uri"] as? String ?? "", descriptionText: eventDictionary!["description"] as! String, day: splitDate[2], month: splitDate[1], year: splitDate[0], hour: timeArray[0], minute: timeArray[1], isApproved: "0", likeCount: "0", seenCount: "0", commentCount: "0", latitude: String(describing: placeLocation!["latitude"]), longitude: String(describing: placeLocation!["longitude"])))
-
+                            
                             ref.child("Events").child(eventID).observe(.value, with: { (snapshot) in
-                               let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
+                                let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
                                 if (isApproved != "1"){
                                     let nonApproved = [
                                         "EventName":eventName,
@@ -186,10 +189,10 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                                         "commentCount":"0",
                                         "Latitude":placeLocation?["latitude"],
                                         "Longitude":placeLocation?["longitude"]
-                                    ] as [String : Any]
+                                        ] as [String : Any]
                                     ref.child("Events").child(eventID).updateChildValues(nonApproved)
                                 }
-
+                                
                             })
                             
                         }
@@ -215,7 +218,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         if isSearching {
             return filteredData.count
         } else {
-        return EventList.count
+            return EventList.count
         }
     }
     
@@ -239,11 +242,11 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                 }
             }
         } else {
-             cell.eventName.text = EventList[indexPath.row].name
+            cell.eventName.text = EventList[indexPath.row].name
             cell.venueDateName.text = EventList[indexPath.row].venue + " @ " + EventList[indexPath.row].day + " " + convertMonth(month: EventList[indexPath.row].month) + " " + EventList[indexPath.row].hour + ":" + EventList[indexPath.row].minute
             cell.eventLink.text = EventList[indexPath.row].ID
             
-        
+            
             let url = URL(string: EventList[indexPath.row].image)
             
             DispatchQueue.global().async {
@@ -271,8 +274,8 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             view.endEditing(true)
             tableView.reloadData()
         } else {
-        isSearching = true
-
+            isSearching = true
+            
             filteredData = EventList.filter({ (mod) -> Bool in
                 return mod.name.lowercased().contains(searchBar.text!.lowercased()) || mod.venue.lowercased().contains(searchBar.text!.lowercased())
             })
@@ -284,12 +287,12 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         if(isSearching){
             selectedID = filteredData[indexPath.row].ID
         } else {
-
-        selectedID = EventList[indexPath.row].ID
+            
+            selectedID = EventList[indexPath.row].ID
         }
     }
     
-   
+    
     
     /*
      // Override to support conditional editing of the table view.
