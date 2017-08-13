@@ -10,12 +10,8 @@ import UIKit
 import FBSDKCoreKit
 import FirebaseDatabase
 
-var approvedEvent: [String] = []
-var dateList: [String] = []
 var list: [String] = []
 var venueLists: [String] = ["8087014348"]
-var pictureList: [String] = []
-var eventIDList: [String] = []
 var selectedID: String = ""
 
 var ref = Database.database().reference()
@@ -41,20 +37,10 @@ class cellClass: UITableViewCell{
             "DateAndVenue":venueDateName.text
         ]
         ref.child("Events").child(eventLink.text!).setValue(addedDictionary)
-        
-        if(approvedEvent.contains(eventLink.text!)){
-            approveButtonView.setTitle("Approved", for: .normal)
-            approveButtonView.backgroundColor = UIColor.blue
-        } else {
-            approveButtonView.backgroundColor = UIColor.orange
-            approveButtonView.setTitle("Approves", for: .normal)
-        }
-        approvedEvent.append(eventLink.text!)
-        
     }
     
-    
 }
+
 
 class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIViewControllerPreviewingDelegate {
     
@@ -100,10 +86,9 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         guard let indexPath = tableView.indexPathForRow(at: location) else { return nil }
-        guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
         guard let detailVC = storyboard?.instantiateViewController(withIdentifier: "EventDetailTableViewController") as? EventDetailTableViewController else { return nil }
         
-        selectedID = eventIDList[indexPath.row]
+        selectedID = EventList[indexPath.row].ID
         
         return detailVC
     }
@@ -143,10 +128,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                             let placeData = eventDictionary?["place"] as? NSDictionary
                             let placeLocation = placeData?["location"] as? NSDictionary
                             let pictureData = eventDictionary?["cover"] as? NSDictionary
-                            
                             let eventName = eventDictionary?["name"] as! String
-                            
-                            //eventIDList.append(eventID)
                             let eventDate = eventDictionary?["start_time"] as! String
                             var dateArray = eventDate._split(separator: "-")
                             let month = dateArray[1]
@@ -157,15 +139,10 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                             let minutes = timeArray[1]
                             let pictureDatas = eventDictionary?["cover"] as? NSDictionary
                             let pictureURL = pictureDatas?["source"] as! String
-                            
-                            
-                            //pictureList.append(pictureURL)
-                            //list.append(eventName)
                             let venuesData = eventDictionary?["place"] as? NSDictionary
                             let venueName = venuesData?["name"] as? String
                             let convertedDate = String(date) + " " + convertMonth(month: month) + " " + String(hour) + ":" + String(minutes)
-                            //dateList.append(venueName! + " @ " + convertedDate)
-                            //self.tableList.reloadData()
+                            
                             let startTime = eventDictionary?["start_time"] as! String
                             var dateArrays = startTime._split(separator: "T")
                             var splitDate = dateArrays[0]._split(separator: "-")
@@ -186,13 +163,11 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             }
         }
         
-        
     }
     
     func sendToDatabase() {
         
         for event in EventList {
-            
             ref.child("Events").child(event.ID).observe(.value, with: { (snapshot) in
                 let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
                 if (isApproved != "1"){
@@ -217,12 +192,8 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                         ] as [String : Any]
                     ref.child("Events").child(event.ID).updateChildValues(nonApproved)
                 }
-                
             })
-            
-            
         }
-        
         
     }
     override func didReceiveMemoryWarning() {
@@ -257,7 +228,6 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             cell.venueDateName.text = filteredData[indexPath.row].venue + " @ " + filteredData[indexPath.row].day + " " + convertMonth(month: filteredData[indexPath.row].month) + " " + filteredData[indexPath.row].hour + ":" + filteredData[indexPath.row].minute
             cell.eventLink.text = filteredData[indexPath.row].ID
             
-            
             let url = URL(string: filteredData[indexPath.row].image)
             
             DispatchQueue.global().async {
@@ -271,7 +241,6 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             cell.eventName.text = EventList[indexPath.row].name
             cell.venueDateName.text = EventList[indexPath.row].venue + " @ " + EventList[indexPath.row].day + " " + convertMonth(month: EventList[indexPath.row].month) + " " + EventList[indexPath.row].hour + ":" + EventList[indexPath.row].minute
             cell.eventLink.text = EventList[indexPath.row].ID
-            
             
             let url = URL(string: EventList[indexPath.row].image)
             
@@ -287,8 +256,6 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
-        
         if searchBar.text == nil {
             isSearching = false
             filteredData = EventList
