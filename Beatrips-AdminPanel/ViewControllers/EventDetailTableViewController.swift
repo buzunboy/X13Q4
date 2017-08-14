@@ -104,7 +104,7 @@ class EventDetailTableViewController: UITableViewController {
         let keyboardFrame:NSValue = userInfo.value(forKey: UIKeyboardFrameEndUserInfoKey) as! NSValue
         let keyboardRectangle = keyboardFrame.cgRectValue
         var items = [UIBarButtonItem]()
-        let doneButton = UIBarButtonItem(title: "Done", style: .done, target: nil, action: "dismissKeyboard")
+        let doneButton = UIBarButtonItem(title: "Done", style: .done, target: nil, action: #selector(EventDetailTableViewController.dismissKeyboard))
         items.append(doneButton)
         keyBoardHeight = keyboardRectangle.height
         
@@ -149,11 +149,6 @@ class EventDetailTableViewController: UITableViewController {
             self.navBar.isTranslucent = true
             self.navigationItem.rightBarButtonItem = approveItem
 
-            let navItem = UINavigationItem(title: "")
-
-            
-           // self.navBar.setItems([navItem], animated: false)
-            
         })
     }
     
@@ -168,7 +163,7 @@ class EventDetailTableViewController: UITableViewController {
                 "EventImage":   snapshot.childSnapshot(forPath: "EventImage").value as! String,
                 "VenueID":      snapshot.childSnapshot(forPath: "VenueID").value as! String,
                 "Details":      snapshot.childSnapshot(forPath: "Details").value as! String,
-                "TicketLink":   snapshot.childSnapshot(forPath: "TicketLink").value as? String,
+                "TicketLink":   snapshot.childSnapshot(forPath: "TicketLink").value as? String ?? "",
                 "Day":          snapshot.childSnapshot(forPath: "Day").value as! String,
                 "Month":        snapshot.childSnapshot(forPath: "Month").value as! String,
                 "Year":         snapshot.childSnapshot(forPath: "Year").value as! String,
@@ -183,7 +178,7 @@ class EventDetailTableViewController: UITableViewController {
             let locationDictionary = [
                 "Latitude":     snapshot.childSnapshot(forPath: "Latitude").value as? Double ?? 0,
                 "Longitude":    snapshot.childSnapshot(forPath: "Longitude").value as? Double ?? 0
-                ] as! [String:Double]
+                ]
             self.eventNameField.text = eventInfo["EventName"] as? String
             self.venueNameField.text = eventInfo["VenueName"] as? String
             self.descriptionText.text = eventInfo["Details"] as? String
@@ -240,7 +235,7 @@ class EventDetailTableViewController: UITableViewController {
             "EventName":self.eventNameField.text,
             "VenueName":self.venueNameField.text,
             "Details": self.descriptionText.text,
-            "TicketLink": self.ticketLink.text,
+            "TicketLink": self.ticketLink.text ?? "",
             "Day": self.dayLabel.text!,
             "Month":self.monthLabel.text!,
             "Year":self.yearLabel.text!,

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		5A1B88D72C7E574985113098 /* Pods_Beatrips_AdminPanel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 171445F0A3B5A9F30696AE35 /* Pods_Beatrips_AdminPanel.framework */; };
+		B00862C51F4210BA00FA65F8 /* PagesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00862C41F4210BA00FA65F8 /* PagesTableViewController.swift */; };
+		B00862C81F4212D200FA65F8 /* PagesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00862C71F4212D200FA65F8 /* PagesModel.swift */; };
+		B00862CA1F42301700FA65F8 /* AddPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00862C91F42301700FA65F8 /* AddPageViewController.swift */; };
 		B00C97351F32487500DF4406 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00C97341F32487500DF4406 /* AppDelegate.swift */; };
 		B00C97371F32487500DF4406 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00C97361F32487500DF4406 /* FirstViewController.swift */; };
 		B00C97391F32487500DF4406 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00C97381F32487500DF4406 /* SecondViewController.swift */; };
@@ -30,6 +33,9 @@
 /* Begin PBXFileReference section */
 		171445F0A3B5A9F30696AE35 /* Pods_Beatrips_AdminPanel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Beatrips_AdminPanel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		371A33002DDFD77FDBD01F7D /* Pods-Beatrips-AdminPanel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Beatrips-AdminPanel.release.xcconfig"; path = "Pods/Target Support Files/Pods-Beatrips-AdminPanel/Pods-Beatrips-AdminPanel.release.xcconfig"; sourceTree = "<group>"; };
+		B00862C41F4210BA00FA65F8 /* PagesTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PagesTableViewController.swift; path = ViewControllers/PagesTableViewController.swift; sourceTree = "<group>"; wrapsLines = 0; };
+		B00862C71F4212D200FA65F8 /* PagesModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PagesModel.swift; path = "Event Model/PagesModel.swift"; sourceTree = "<group>"; };
+		B00862C91F42301700FA65F8 /* AddPageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddPageViewController.swift; path = ViewControllers/AddPageViewController.swift; sourceTree = "<group>"; };
 		B00C97311F32487500DF4406 /* Beatrips-AdminPanel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Beatrips-AdminPanel.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00C97341F32487500DF4406 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B00C97361F32487500DF4406 /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
@@ -86,6 +92,21 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		B00862C61F4210D100FA65F8 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				B00C974A1F3249C600DF4406 /* EventsTableViewController.swift */,
+				B00C97361F32487500DF4406 /* FirstViewController.swift */,
+				B00C97381F32487500DF4406 /* SecondViewController.swift */,
+				B0397EFB1F3DCC8F000F1F53 /* EventDetailTableViewController.swift */,
+				B049FC311F38592A002081A1 /* EventDetailViewController.swift */,
+				B0A5A0E41F36166700FD546A /* LoginViewController.swift */,
+				B00862C41F4210BA00FA65F8 /* PagesTableViewController.swift */,
+				B00862C91F42301700FA65F8 /* AddPageViewController.swift */,
+			);
+			name = "View Controllers";
+			sourceTree = "<group>";
+		};
 		B00C97281F32487500DF4406 = {
 			isa = PBXGroup;
 			children = (
@@ -113,15 +134,11 @@
 			children = (
 				B0A5A0E31F36153A00FD546A /* Beatrips-AdminPanel.entitlements */,
 				B00C97341F32487500DF4406 /* AppDelegate.swift */,
-				B00C974A1F3249C600DF4406 /* EventsTableViewController.swift */,
 				B0864CE41F406A70008A688C /* EventModel.swift */,
+				B00862C71F4212D200FA65F8 /* PagesModel.swift */,
 				B0A5A0E61F374A5C00FD546A /* monthConverter.swift */,
-				B00C97361F32487500DF4406 /* FirstViewController.swift */,
-				B00C97381F32487500DF4406 /* SecondViewController.swift */,
+				B00862C61F4210D100FA65F8 /* View Controllers */,
 				B00C973A1F32487500DF4406 /* Main.storyboard */,
-				B0397EFB1F3DCC8F000F1F53 /* EventDetailTableViewController.swift */,
-				B049FC311F38592A002081A1 /* EventDetailViewController.swift */,
-				B0A5A0E41F36166700FD546A /* LoginViewController.swift */,
 				B00C973D1F32487500DF4406 /* Assets.xcassets */,
 				B00C973F1F32487500DF4406 /* LaunchScreen.storyboard */,
 				B049FC2F1F385501002081A1 /* GoogleService-Info.plist */,
@@ -260,11 +277,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B00862C51F4210BA00FA65F8 /* PagesTableViewController.swift in Sources */,
 				B00C97391F32487500DF4406 /* SecondViewController.swift in Sources */,
 				B0864CE51F406A70008A688C /* EventModel.swift in Sources */,
+				B00862C81F4212D200FA65F8 /* PagesModel.swift in Sources */,
 				B00C97351F32487500DF4406 /* AppDelegate.swift in Sources */,
 				B00C974B1F3249C600DF4406 /* EventsTableViewController.swift in Sources */,
 				B0397EFC1F3DCC8F000F1F53 /* EventDetailTableViewController.swift in Sources */,
+				B00862CA1F42301700FA65F8 /* AddPageViewController.swift in Sources */,
 				B0A5A0E71F374A5C00FD546A /* monthConverter.swift in Sources */,
 				B0A5A0E51F36166700FD546A /* LoginViewController.swift in Sources */,
 				B049FC321F38592A002081A1 /* EventDetailViewController.swift in Sources */,

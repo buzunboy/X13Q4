@@ -58,7 +58,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         }
         refreshControls = UIRefreshControl()
         refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
-        refreshControls.addTarget(self, action: "refresh", for: UIControlEvents.valueChanged)
+        refreshControls.addTarget(self, action: #selector(EventsTableViewController.refresh), for: UIControlEvents.valueChanged)
         tableView.addSubview(refreshControls)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
