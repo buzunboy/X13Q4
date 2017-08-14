@@ -44,6 +44,7 @@ class EventDetailTableViewController: UITableViewController {
     var keyboardDone = UIToolbar()
     var keyBoardHeight: CGFloat = 0
     var visualEffectView = UIVisualEffectView()
+    var activityIndicator = UIActivityIndicatorView()
     
     @IBOutlet weak var descriptionTextBottomConstraint: NSLayoutConstraint!
     
@@ -71,6 +72,15 @@ class EventDetailTableViewController: UITableViewController {
         self.navigationController?.navigationBar.isTranslucent = true
         self.navigationController?.navigationBar.tintColor = UIColor.white
         self.navigationController?.navigationBar.shadowImage = UIImage()
+        activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.whiteLarge)
+        activityIndicator.color = UIColor.gray
+        activityIndicator.frame = CGRect(x: eventImage.frame.origin.x, y: eventImage.frame.origin.y, width: eventImage.frame.size.width, height: eventImage.frame.size.height)
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.startAnimating()
+        eventImage.image = UIImage()
+        view.addSubview(activityIndicator)
+        
+
         //view.addGestureRecognizer(tap)
         keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
         NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillShow(notification:)), name: .UIKeyboardWillShow, object: nil)
@@ -212,6 +222,7 @@ class EventDetailTableViewController: UITableViewController {
                 DispatchQueue.main.async {
                     self.eventImage.image = UIImage(data: data!)
                     self.imageS = UIImage(data: data!)!
+                    self.activityIndicator.stopAnimating()
                 }
             }
             self.hiddenImageURL.text = eventInfo["EventImage"] as? String

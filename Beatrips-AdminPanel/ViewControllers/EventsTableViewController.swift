@@ -244,9 +244,16 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "eventCell", for: indexPath) as! cellClass
+        var activityIndicator = UIActivityIndicatorView()
+        activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.whiteLarge)
+        activityIndicator.color = UIColor.gray
+        activityIndicator.frame = CGRect(x: cell.eventImage.frame.origin.x, y: cell.eventImage.frame.origin.y, width: cell.eventImage.frame.size.width, height: cell.eventImage.frame.size.height)
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.startAnimating()
+        cell.eventImage.image = nil
+        cell.eventImage.addSubview(activityIndicator)
         
         if(isSearching){
-            cell.eventImage.image = nil
             cell.eventName.text = filteredData[indexPath.row].name
             cell.venueDateName.text = filteredData[indexPath.row].venue + " @ " + filteredData[indexPath.row].day + " " + convertMonth(month: filteredData[indexPath.row].month) + " " + filteredData[indexPath.row].hour + ":" + filteredData[indexPath.row].minute
             cell.eventLink.text = filteredData[indexPath.row].ID
@@ -258,10 +265,10 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                 let data = try? Data(contentsOf: url!)
                 DispatchQueue.main.async {
                     cell.eventImage.image = UIImage(data: data!)
+                    activityIndicator.stopAnimating()
                 }
             }
         } else {
-            cell.eventImage.image = nil
             cell.eventName.text = EventList[indexPath.row].name
             cell.venueDateName.text = EventList[indexPath.row].venue + " @ " + EventList[indexPath.row].day + " " + convertMonth(month: EventList[indexPath.row].month) + " " + EventList[indexPath.row].hour + ":" + EventList[indexPath.row].minute
             cell.eventLink.text = EventList[indexPath.row].ID
@@ -273,6 +280,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                 let data = try? Data(contentsOf: url!)
                 DispatchQueue.main.async {
                     cell.eventImage.image = UIImage(data: data!)
+                    activityIndicator.stopAnimating()
                 }
             }
         }
