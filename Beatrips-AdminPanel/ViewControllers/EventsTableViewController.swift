@@ -39,6 +39,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     var refreshControls = UIRefreshControl()
     var filteredData = [EventModel]()
     var isSearching = false
+    var visualEffectView = UIVisualEffectView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,13 +67,48 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        getList()
-        self.navigationController?.isNavigationBarHidden = false
+    override func viewWillAppear(_ animated: Bool) {
+
         self.navigationItem.setHidesBackButton(true, animated: false)
+        setNavigationBar(isDisappear: false)
         
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        getList()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        setNavigationBar(isDisappear: true)
+        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        setNavigationBar(isDisappear: true)
+    }
+    
+    func setNavigationBar(isDisappear: Bool) {
+        
+        if(isDisappear){
+            visualEffectView.removeFromSuperview()
+        }else {
+            let bounds = self.navigationController?.navigationBar.bounds as CGRect!
+            visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+            visualEffectView.frame = CGRect(x: (bounds?.origin.x)!, y: (bounds?.origin.y)! - 20, width: (bounds?.size.width)!, height: 64)
+            visualEffectView.alpha = 0.8
+            
+            visualEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            let topView = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
+            topView.textColor = UIColor.white
+            topView.text = "Events"
+            self.navigationController?.navigationBar.topItem?.titleView = topView
+            self.navigationController?.navigationBar.barStyle = .black
+            self.navigationController?.navigationBar.setBackgroundImage(UIImage(named: "background"), for: .default)
+            self.navigationController?.navigationBar.insertSubview(visualEffectView, at: 2)
+        }
+        // Here you can add visual effects to any UIView control.
+        // Replace custom view with navigation bar in above code to add effects to custom view.
+    }
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         guard let indexPath = tableView.indexPathForRow(at: location) else { return nil }
@@ -124,7 +160,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                             var dateArray = eventDate._split(separator: "-")
                             let dayArray = dateArray[2]._split(separator: "T")
                             var timeArray = dayArray[1]._split(separator: ":")
-
+                            
                             let startTime = eventDictionary?["start_time"] as! String
                             var dateArrays = startTime._split(separator: "T")
                             var splitDate = dateArrays[0]._split(separator: "-")

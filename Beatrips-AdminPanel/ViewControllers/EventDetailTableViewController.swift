@@ -43,6 +43,7 @@ class EventDetailTableViewController: UITableViewController {
     var imageS = UIImage()
     var keyboardDone = UIToolbar()
     var keyBoardHeight: CGFloat = 0
+    var visualEffectView = UIVisualEffectView()
     
     @IBOutlet weak var descriptionTextBottomConstraint: NSLayoutConstraint!
     
@@ -54,7 +55,7 @@ class EventDetailTableViewController: UITableViewController {
     
     @IBAction func swipedLeft(_ sender: Any) {
         
-        self.performSegue(withIdentifier: "goBack", sender: self)
+       // self.performSegue(withIdentifier: "goBack", sender: self)
         
     }
     var list: [String] = []
@@ -65,7 +66,11 @@ class EventDetailTableViewController: UITableViewController {
         // self.tableView.contentInset = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
         setNavigationBar(isComeFromViewDidAppear: false)
         getInfo()
-
+        self.navigationController?.navigationBar.backgroundColor = UIColor.clear
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        self.navigationController?.navigationBar.isTranslucent = true
+        self.navigationController?.navigationBar.tintColor = UIColor.white
+        self.navigationController?.navigationBar.shadowImage = UIImage()
         //view.addGestureRecognizer(tap)
         keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
         NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillShow(notification:)), name: .UIKeyboardWillShow, object: nil)
@@ -79,6 +84,7 @@ class EventDetailTableViewController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         setNavigationBar(isComeFromViewDidAppear: true)
+        
     }
     
     
@@ -114,10 +120,11 @@ class EventDetailTableViewController: UITableViewController {
         extendedLayoutIncludesOpaqueBars = true
         tableView.bounces = true
         
-        
         let selectionView = UIView()
         UITableViewCell.appearance().selectedBackgroundView = selectionView
-        self.navigationController?.navigationBar.isHidden = true
+        //self.navigationController?.navigationBar.isHidden = true
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        
         
         statusFrame = UIView(frame:     CGRect(x: 0, y: self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 20))
         navBar = UINavigationBar(frame: CGRect(x: 0, y: self.tableView.contentOffset.y + 20, width: UIScreen.main.bounds.width, height: 44))
@@ -126,22 +133,21 @@ class EventDetailTableViewController: UITableViewController {
         
         ref.child("Events").child(selectedID).observe(.value, with: { (snapshot) in
             let approvedTitleDecider = snapshot.childSnapshot(forPath: "isApproved").value as! String
-            let backItem = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: Selector("goBack"))
+            
             let approvedTitle = (approvedTitleDecider == "0") ? "Approve" : "Update"
-            let approveItem = UIBarButtonItem(title: approvedTitle, style: .done, target: nil, action: Selector("approveEvent"))
+            let approveItem = UIBarButtonItem(title: approvedTitle, style: .done, target: self, action: #selector(EventDetailTableViewController.approveEvent(sender:)))
             self.navBar.isTranslucent = true
-            
-            self.view.addSubview(self.navBar)
-            self.view.addSubview(self.statusFrame)
+            self.navigationItem.rightBarButtonItem = approveItem
+
             let navItem = UINavigationItem(title: "")
-            navItem.leftBarButtonItem = backItem
-            navItem.rightBarButtonItem = approveItem
+
             
-            self.navBar.setItems([navItem], animated: false)
+           // self.navBar.setItems([navItem], animated: false)
             
         })
     }
     
+
     func getInfo(){
         
         
@@ -217,7 +223,7 @@ class EventDetailTableViewController: UITableViewController {
         self.performSegue(withIdentifier: "goBack", sender: self)
     }
     
-    func approveEvent(){
+    func approveEvent(sender: UIBarButtonItem){
         
         let addedDictionary = [
             "EventName":self.eventNameField.text,
@@ -250,7 +256,6 @@ class EventDetailTableViewController: UITableViewController {
             self.imageFrame.image = self.imageS
             self.imageFrame.contentMode = .scaleAspectFill
             self.imageFrame.clipsToBounds = true
-            
             self.view.insertSubview(self.imageFrame, at: 2)
             
         }
@@ -258,32 +263,27 @@ class EventDetailTableViewController: UITableViewController {
         keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - keyBoardHeight - 44 + self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
         
         
-        navBar.frame = CGRect(x: 0, y: self.tableView.contentOffset.y + 20, width: UIScreen.main.bounds.width, height: 44)
-        statusFrame.frame = CGRect(x: 0, y: self.tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 20)
-        if(self.tableView.contentOffset.y >= 140){
-            UIView.animate(withDuration: 0.5, animations: {
-                self.statusFrame.backgroundColor = UIColor(red: 0.1, green: 0.1, blue: 0.1, alpha: 1)
-                self.navBar.backgroundColor = UIColor(red: 0.1, green: 0.1, blue: 0.1, alpha: 1)
+        if(self.tableView.contentOffset.y >= 130){
+            UIView.animate(withDuration: 2, animations: {
                 let topView = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
                 topView.textColor = UIColor.white
                 topView.text = self.eventNameField.text
-                self.navBar.topItem?.titleView = topView
-                self.navigationController?.navigationBar.barStyle = .blackTranslucent
-                
-                
+                self.navigationController?.navigationBar.topItem?.titleView = topView
+                self.navigationController?.navigationBar.isTranslucent = false
+                self.navigationController?.navigationBar.setBackgroundImage(UIImage(named: "background"), for: .default)
             })
             
         } else {
             UIView.animate(withDuration: 0.5, animations: {
-                self.statusFrame.backgroundColor = UIColor.clear
-                self.navBar.backgroundColor = UIColor.clear
-                self.navBar.topItem?.titleView = UIView()
-                self.navigationController?.navigationBar.barStyle = .default
+                self.navigationController?.navigationBar.topItem?.titleView = UIView()
+                self.navigationController?.navigationBar.backgroundColor = UIColor.clear
+                self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+                self.navigationController?.navigationBar.isTranslucent = true
             })
         }
         
-        
     }
+
     
     func changeStatusBarColor(){
         currentStyle = .lightContent
