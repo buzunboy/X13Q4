@@ -12,18 +12,33 @@ import FirebaseDatabase
 
 var selectedPageID = ""
 
-class PagesTableViewController: UITableViewController {
+class PagesTableViewController: UITableViewController, UIViewControllerPreviewingDelegate, UISearchBarDelegate {
     
+    
+    @IBOutlet weak var searchBar: UISearchBar!
+    var isSearching = false
     var ref = Database.database().reference()
     var Pages = [PagesModel]()
     var refreshControls = UIRefreshControl()
-    
+    var visualEffectView = UIVisualEffectView()
+    var filteredData = [PagesModel]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
         refreshControls.addTarget(self, action: #selector(PagesTableViewController.getPages), for: UIControlEvents.valueChanged)
         tableView.addSubview(refreshControls)
+        
+        self.navigationController?.navigationBar.isHidden = false
+        self.navigationItem.setHidesBackButton(true, animated: false)
+        
+        searchBar.delegate = self
+        searchBar.returnKeyType = UIReturnKeyType.done
+        searchBar.placeholder = "Search Event"
+        
+        if( traitCollection.forceTouchCapability == .available){
+            registerForPreviewing(with: self, sourceView: view)
+        }
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -32,18 +47,60 @@ class PagesTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
-    
-    
     override func viewWillAppear(_ animated: Bool) {
+        self.navigationItem.setHidesBackButton(true, animated: false)
+        setNavigationBar(isDisappear: false)
         Pages.removeAll()
         self.tableView.reloadData()
         getPages()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        setNavigationBar(isDisappear: true)
+        
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
+        guard let indexPath = tableView.indexPathForRow(at: location) else { return nil }
+        guard let detailVC = storyboard?.instantiateViewController(withIdentifier: "PageDetailTableViewController") as? PageDetailTableViewController else { return nil }
+        
+        selectedPageID = Pages[indexPath.row].ID
+        
+        return detailVC
+    }
+    
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
+        show(viewControllerToCommit, sender: self)
+    }
+    
+    func setNavigationBar(isDisappear: Bool) {
+        
+        if(isDisappear){
+            visualEffectView.removeFromSuperview()
+        }else {
+            let bounds = self.navigationController?.navigationBar.bounds as CGRect!
+            visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+            visualEffectView.frame = CGRect(x: (bounds?.origin.x)!, y: (bounds?.origin.y)! - 20, width: (bounds?.size.width)!, height: 64)
+            visualEffectView.alpha = 0.8
+            
+            visualEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            let topView = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
+            topView.textColor = UIColor.white
+            topView.text = "Pages & Venues"
+            self.navigationController?.navigationBar.topItem?.titleView = topView
+            self.navigationController?.navigationBar.barStyle = .black
+            self.navigationController?.navigationBar.setBackgroundImage(UIImage(named: "background"), for: .default)
+            self.navigationController?.navigationBar.insertSubview(visualEffectView, at: 0)
+        }
+        // Here you can add visual effects to any UIView control.
+        // Replace custom view with navigation bar in above code to add effects to custom view.
+    }
+
     
     func getPages(){
         Pages.removeAll()
@@ -75,19 +132,49 @@ class PagesTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return Pages.count
+        if isSearching {
+            return filteredData.count
+        } else {
+            return Pages.count
+        }
     }
     
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "pagesCell", for: indexPath)
         
-        cell.textLabel?.text = Pages[indexPath.row].name
-        cell.detailTextLabel?.text = Pages[indexPath.row].ID
+        if(isSearching){
+            cell.textLabel?.text = filteredData[indexPath.row].name
+            cell.detailTextLabel?.text = filteredData[indexPath.row].ID
+        } else {
+            cell.textLabel?.text = Pages[indexPath.row].name
+            cell.detailTextLabel?.text = Pages[indexPath.row].ID
+        }
+        
         
         // Configure the cell...
         
         return cell
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text == nil {
+            isSearching = false
+            filteredData = Pages
+            view.endEditing(true)
+            tableView.reloadData()
+        } else if searchBar.text == "" {
+            isSearching = false
+            filteredData = Pages
+            view.endEditing(true)
+            tableView.reloadData()
+        } else {
+            isSearching = true
+            filteredData = Pages.filter({ (mod) -> Bool in
+                return mod.name.lowercased().contains(searchBar.text!.lowercased()) || mod.ID.lowercased().contains(searchBar.text!.lowercased())
+            })
+            tableView.reloadData()
+        }
     }
     
     // Override to support editing the table view.
@@ -104,7 +191,11 @@ class PagesTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedPageID = Pages[indexPath.row].ID
+        if(isSearching){
+            selectedPageID = filteredData[indexPath.row].ID
+        } else {
+            selectedPageID = Pages[indexPath.row].ID
+        }
     }
     
     /*

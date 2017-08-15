@@ -13,7 +13,9 @@ import MapKit
 class PageDetailTableViewController: UITableViewController {
     
     @IBOutlet weak var venueImage: UIImageView!
+    @IBOutlet weak var venueSmallImage: UIImageView!
     @IBOutlet weak var venueName: UITextView!
+    @IBOutlet weak var venueID: UITextField!
     @IBOutlet weak var isApprovedLabel: UILabel!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var websiteField: UITextField!
@@ -50,6 +52,9 @@ class PageDetailTableViewController: UITableViewController {
         self.navigationController?.navigationBar.tintColor = UIColor.white
         self.navigationController?.navigationBar.shadowImage = UIImage()
         getInfo()
+        
+        createRoundImage()
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -73,15 +78,15 @@ class PageDetailTableViewController: UITableViewController {
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         
 
-        /*
-        ref.child("Events").child(selectedID).observe(.value, with: { (snapshot) in
-            let approvedTitleDecider = snapshot.childSnapshot(forPath: "isApproved").value as! String
+        
+        ref.child("Pages").child(selectedPageID).observe(.value, with: { (snapshot) in
+            let approvedTitleDecider = snapshot.childSnapshot(forPath: "isActive").value as! String
             
-            let approvedTitle = (approvedTitleDecider == "0") ? "Approve" : "Update"
+            let approvedTitle = (approvedTitleDecider == "0") ? "Activate" : "Update"
             let approveItem = UIBarButtonItem(title: approvedTitle, style: .done, target: self, action: #selector(EventDetailTableViewController.approveEvent(sender:)))
             self.navigationItem.rightBarButtonItem = approveItem
             
-        }) */
+        })
     }
 
     func changeStatusBarColor(){
@@ -90,36 +95,95 @@ class PageDetailTableViewController: UITableViewController {
         self.setNeedsStatusBarAppearanceUpdate()
     }
     
+    func createRoundImage(){
+        venueSmallImage.contentMode = .scaleToFill
+        venueSmallImage.clipsToBounds = true
+        venueSmallImage.layer.cornerRadius = venueSmallImage.frame.size.width / 2
+        venueSmallImage.layer.borderWidth = 2.0
+        venueSmallImage.layer.borderColor = UIColor.orange.cgColor
+    }
+    
     func getInfo(){
         
         ref.child("Pages").child(selectedPageID).observe(.value, with: { (snasphot) in
-            let pageInfo = [
-                "Name": snasphot.childSnapshot(forPath: "Name").value as? String ?? "",
-                "ID": snasphot.childSnapshot(forPath: "ID").value as? String ?? "",
-                "About": snasphot.childSnapshot(forPath: "About").value as? String ?? "",
-                "Address": snasphot.childSnapshot(forPath: "Address").value as? String ?? "",
-                "CoverPhoto": snasphot.childSnapshot(forPath: "CoverPhoto").value as? String ?? "",
-                "Picture": snasphot.childSnapshot(forPath: "Picture").value as? String ?? "",
-                "Website": snasphot.childSnapshot(forPath: "Website").value as? String ?? "",
-                "City": snasphot.childSnapshot(forPath: "City").value as? String ?? "",
-                "Country": snasphot.childSnapshot(forPath: "Country").value as? String ?? "",
-                "Latitude": snasphot.childSnapshot(forPath: "Latitude").value as? Double ?? 0,
-                "Longitude": snasphot.childSnapshot(forPath: "Name").value as? Double ?? 0,
-                "isActive": snasphot.childSnapshot(forPath: "Name").value as? String ?? "0"
-            ]
-            self.venueName.text = pageInfo["Name"] as? String
-            self.websiteField.text = pageInfo["Website"] as? String
-            self.latitudeField.text = pageInfo["Latitude"] as? String
-            self.longitudeField.text = pageInfo["Longitude"] as? String
-            self.addressField.text = pageInfo["Address"] as? String
-            self.cityField.text = pageInfo["City"] as? String
-            self.countryField.text = pageInfo["Country"] as? String
-            self.descriptionText.text = pageInfo["About"] as? String
+
+            self.venueName.text = snasphot.childSnapshot(forPath: "Name").value as? String ?? ""
+            self.websiteField.text = snasphot.childSnapshot(forPath: "Website").value as? String ?? ""
+           
+            self.addressField.text = snasphot.childSnapshot(forPath: "Address").value as? String ?? ""
+            self.cityField.text = snasphot.childSnapshot(forPath: "City").value as? String ?? ""
+            self.countryField.text = snasphot.childSnapshot(forPath: "Country").value as? String ?? ""
+            self.descriptionText.text = snasphot.childSnapshot(forPath: "About").value as? String ?? ""
+            
+            let latitude = snasphot.childSnapshot(forPath: "Latitude").value as? Double ?? 0
+            let longitude = snasphot.childSnapshot(forPath: "Longitude").value as? Double ?? 0
+            self.longitudeField.text = String(describing: longitude)
+            self.latitudeField.text = String(describing: latitude)
+
+            
+            let isApproved = snasphot.childSnapshot(forPath: "isActive").value as? String ?? "0"
+            self.isApprovedLabel.text = isApproved == "1" ? "YES" : "NO"
+            
+            let url = URL(string: snasphot.childSnapshot(forPath: "CoverPhoto").value as? String ?? "")
+            let pictureUrl = URL(string: snasphot.childSnapshot(forPath: "Picture").value as? String ?? "")
+            self.venueID.text = snasphot.childSnapshot(forPath: "ID").value as? String ?? ""
+            
+            
+            
+            let maxHeight = self.descriptionText.sizeThatFits(CGSize(width: self.descriptionText.frame.size.width, height: CGFloat.greatestFiniteMagnitude))
+            if (maxHeight.height <= 70){
+                self.seeMore.isHidden = true
+                self.descriptionTextBottomConstraint.constant = 2
+            }
+            
+            DispatchQueue.global().async {
+                let data = try? Data(contentsOf: url!)
+                let dataP = try? Data(contentsOf: pictureUrl!)
+                DispatchQueue.main.async {
+                    self.venueImage.image = UIImage(data: data!)
+                    self.imageS = UIImage(data: data!)!
+                    self.venueSmallImage.image = UIImage(data: dataP!)
+                    self.activityIndicator.stopAnimating()
+                }
+            }
+            
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            self.mapView.addAnnotation(annotation)
+            let region = MKCoordinateRegion(center: annotation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005))
+            self.mapView.setRegion(region, animated: true)
+            
+            
             
         })
         
     }
+    
+    func approveEvent(sender: UIBarButtonItem){
+        
+        let venueDictionary = [
+            "Name":venueName.text,
+            "ID":venueID.text,
+            "About":descriptionText.text,
+            "Website":websiteField.text,
+            //"CoverPhoto":venueImage.,
+            //"Picture":picture,
+            "City":cityField.text,
+            "Country":countryField.text,
+            "Latitude":Double(latitudeField.text!),
+            "Longitude":Double(longitudeField.text!),
+            "Address":addressField.text,
+            "isActive":"1"
+            ] as [String : Any]
+        ref.child("Pages").child(selectedPageID).updateChildValues(venueDictionary)
+        
+        
+    }
 
+    @IBAction func deletePage(_ sender: Any) {
+        let deleteDictionary = ["isActive":"0"]
+        ref.child("Pages").child(selectedPageID).updateChildValues(deleteDictionary)
+    }
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -129,7 +193,7 @@ class PageDetailTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 7
+        return 9
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -171,7 +235,7 @@ class PageDetailTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         var row6Height: CGFloat = 70
-        if (selectedRow == 4){
+        if (selectedRow == 5){
             let maxHeight = descriptionText.sizeThatFits(CGSize(width: descriptionText.frame.size.width, height: CGFloat.greatestFiniteMagnitude))
             row6Height = (maxHeight.height >= 70) ? maxHeight.height + 40 : 70
             descriptionTextBottomConstraint.constant = 0
@@ -181,17 +245,21 @@ class PageDetailTableViewController: UITableViewController {
         case 0:
             return 170
         case 1:
-            return 70
+            return 80
         case 2:
-            return 40
+            return 70
         case 3:
-            return 155
+            return 40
         case 4:
-            return row6Height
+            return 155
         case 5:
-            return 235
+            return row6Height
         case 6:
+            return 235
+        case 7:
             return 75
+        case 8:
+            return 55
         default:
             return 50
         }
@@ -199,8 +267,8 @@ class PageDetailTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if(indexPath.row == 4){
-            selectedRow = 4
+        if(indexPath.row == 5){
+            selectedRow = 5
             self.tableView.beginUpdates()
             self.tableView.endUpdates()
         }

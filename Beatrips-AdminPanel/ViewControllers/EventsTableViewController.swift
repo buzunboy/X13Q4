@@ -52,9 +52,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         searchBar.placeholder = "Search Event"
         
         if( traitCollection.forceTouchCapability == .available){
-            
             registerForPreviewing(with: self, sourceView: view)
-            
         }
         refreshControls = UIRefreshControl()
         refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
@@ -120,9 +118,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     }
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
-        
         show(viewControllerToCommit, sender: self)
-        
     }
     
     func refresh(){
