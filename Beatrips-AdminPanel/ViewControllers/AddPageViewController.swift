@@ -74,6 +74,7 @@ class AddPageViewController: UIViewController {
                     let latitude = locationDictionary?["latitude"] as? Double ?? 0
                     let longitude = locationDictionary?["longitude"] as? Double ?? 0
                     let address = locationDictionary?["street"] as? String ?? ""
+                    let isActive = "1"
                     
                     let venueDictionary = [
                     "Name":name,
@@ -86,7 +87,8 @@ class AddPageViewController: UIViewController {
                     "Country":country,
                     "Latitude":latitude,
                     "Longitude":longitude,
-                    "Address":address
+                    "Address":address,
+                    "isActive":isActive
                     ] as [String : Any]
                     
                     self.ref.child("Pages").child(self.pageID.text!).updateChildValues(venueDictionary)

@@ -14,7 +14,7 @@ class PagesModel: NSObject {
     var ID: String = ""
     
     init(name: String, ID: String){
-        self.name = name
+        self.name = name.capitalized
         self.ID = ID
     }
 

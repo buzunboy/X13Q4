@@ -118,49 +118,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Beatrips-AdminPanel/ViewControllers/PagesTableViewController.swift"
-            timestampString = "524431835.253145"
+            timestampString = "524484038.925406"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "50"
-            endingLineNumber = "50"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
             landmarkName = "getPages()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Beatrips_AdminPanel.PagesTableViewController.(getPages () -&gt; ()).(closure #1).(closure #1)"
-                  moduleName = "Beatrips-AdminPanel"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/burakuzunboy/Documents/Beatrips_New/AdminPanel/Beatrips-AdminPanel/Beatrips-AdminPanel/ViewControllers/PagesTableViewController.swift"
-                  timestampString = "524434924.862751"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "50"
-                  endingLineNumber = "50"
-                  offsetFromSymbolStart = "44">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Beatrips_AdminPanel.PagesTableViewController.(getPages () -&gt; ()).(closure #1).(closure #1).(implicit closure #1)"
-                  moduleName = "Beatrips-AdminPanel"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/burakuzunboy/Documents/Beatrips_New/AdminPanel/Beatrips-AdminPanel/Beatrips-AdminPanel/ViewControllers/PagesTableViewController.swift"
-                  timestampString = "524434924.867778"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "50"
-                  endingLineNumber = "50"
-                  offsetFromSymbolStart = "16">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -170,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Beatrips-AdminPanel/ViewControllers/AddPageViewController.swift"
-            timestampString = "524434972.127882"
+            timestampString = "524484038.925406"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "92"
-            endingLineNumber = "92"
+            startingLineNumber = "94"
+            endingLineNumber = "94"
             landmarkName = "sendPage(_:)"
             landmarkType = "7">
          </BreakpointContent>

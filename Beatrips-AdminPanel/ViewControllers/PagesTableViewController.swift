@@ -10,11 +10,14 @@ import UIKit
 import FBSDKCoreKit
 import FirebaseDatabase
 
+var selectedPageID = ""
+
 class PagesTableViewController: UITableViewController {
     
     var ref = Database.database().reference()
     var Pages = [PagesModel]()
     var refreshControls = UIRefreshControl()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +32,7 @@ class PagesTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
-  
+    
     
     override func viewWillAppear(_ animated: Bool) {
         Pages.removeAll()
@@ -47,9 +50,14 @@ class PagesTableViewController: UITableViewController {
         ref.child("Pages").observe(.childAdded, with: { (snapshot) in
             if let pageID = snapshot.key as? String {
                 self.ref.child("Pages").child(pageID).observe(.value, with: { (snap) in
-                    let pageName = snap.childSnapshot(forPath: "Name").value as? String ?? ""
+                    var pageName = snap.childSnapshot(forPath: "Name").value as? String ?? ""
                     if(pageName != ""){
-                        self.Pages.append(PagesModel(name: pageName, ID: pageID as? String ?? ""))
+                        
+                        let isActive = snap.childSnapshot(forPath: "isActive").value as? String ?? "0"
+                        if(isActive != "0"){
+                            self.Pages.append(PagesModel(name: pageName, ID: pageID as? String ?? ""))
+                        }
+                        
                     }
                     self.tableView.reloadData()
                 })
@@ -85,14 +93,18 @@ class PagesTableViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-           
-            ref.child("Pages").child(Pages[indexPath.row].ID).removeValue()
+            let deactivate = ["isActive":"0"]
+            ref.child("Pages").child(Pages[indexPath.row].ID).updateChildValues(deactivate)
             // tableView.reloadRows(at: [indexPath], with: UITableViewRowAnimation.none)
             getPages()
             
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedPageID = Pages[indexPath.row].ID
     }
     
     /*

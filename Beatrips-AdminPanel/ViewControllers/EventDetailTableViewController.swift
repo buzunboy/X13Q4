@@ -54,11 +54,6 @@ class EventDetailTableViewController: UITableViewController {
         return currentStyle
     }
     
-    @IBAction func swipedLeft(_ sender: Any) {
-        
-       // self.performSegue(withIdentifier: "goBack", sender: self)
-        
-    }
     var list: [String] = []
     var navBar: UINavigationBar!
     var statusFrame: UIView!
@@ -223,11 +218,7 @@ class EventDetailTableViewController: UITableViewController {
             self.hiddenImageURL.text = eventInfo["EventImage"] as? String
         })
     }
-    
-    
-    func goBack(){
-        self.performSegue(withIdentifier: "goBack", sender: self)
-    }
+ 
     
     func approveEvent(sender: UIBarButtonItem){
         

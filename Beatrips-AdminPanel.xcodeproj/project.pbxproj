@@ -28,6 +28,7 @@
 		B0A5A0DF1F360DF900FD546A /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0A5A0DA1F360DF900FD546A /* FBSDKShareKit.framework */; };
 		B0A5A0E51F36166700FD546A /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A5A0E41F36166700FD546A /* LoginViewController.swift */; };
 		B0A5A0E71F374A5C00FD546A /* monthConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A5A0E61F374A5C00FD546A /* monthConverter.swift */; };
+		B0C162731F43068000892E8D /* PageDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C162721F43068000892E8D /* PageDetailTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 		B0A5A0E31F36153A00FD546A /* Beatrips-AdminPanel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Beatrips-AdminPanel.entitlements"; sourceTree = "<group>"; };
 		B0A5A0E41F36166700FD546A /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LoginViewController.swift; path = ViewControllers/LoginViewController.swift; sourceTree = "<group>"; };
 		B0A5A0E61F374A5C00FD546A /* monthConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = monthConverter.swift; sourceTree = "<group>"; };
+		B0C162721F43068000892E8D /* PageDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PageDetailTableViewController.swift; path = ViewControllers/PageDetailTableViewController.swift; sourceTree = "<group>"; };
 		D5A7A7FBC02714FFFF0DA4CF /* Pods-Beatrips-AdminPanel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Beatrips-AdminPanel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Beatrips-AdminPanel/Pods-Beatrips-AdminPanel.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,6 +105,7 @@
 				B0A5A0E41F36166700FD546A /* LoginViewController.swift */,
 				B00862C41F4210BA00FA65F8 /* PagesTableViewController.swift */,
 				B00862C91F42301700FA65F8 /* AddPageViewController.swift */,
+				B0C162721F43068000892E8D /* PageDetailTableViewController.swift */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -284,6 +287,7 @@
 				B00C97351F32487500DF4406 /* AppDelegate.swift in Sources */,
 				B00C974B1F3249C600DF4406 /* EventsTableViewController.swift in Sources */,
 				B0397EFC1F3DCC8F000F1F53 /* EventDetailTableViewController.swift in Sources */,
+				B0C162731F43068000892E8D /* PageDetailTableViewController.swift in Sources */,
 				B00862CA1F42301700FA65F8 /* AddPageViewController.swift in Sources */,
 				B0A5A0E71F374A5C00FD546A /* monthConverter.swift in Sources */,
 				B0A5A0E51F36166700FD546A /* LoginViewController.swift in Sources */,
