@@ -13,6 +13,8 @@ import FirebaseDatabase
 class AddPageViewController: UIViewController {
 
     @IBOutlet weak var pageField: UITextField!
+    @IBOutlet weak var pageID: UITextField!
+    
     var ref = Database.database().reference()
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,18 +37,64 @@ class AddPageViewController: UIViewController {
          }
          
          var pageName = ""
-         var pageID = ""
+         var pageIDString = ""
          
          if let pageData = results as? NSDictionary{
          pageName = pageData["name"] as? String ?? ""
-         pageID = pageData["id"] as? String ?? ""
+         pageIDString = pageData["id"] as? String ?? ""
+         self.pageID.text = pageIDString
          }
          let addPage = ["Name":pageName]
-         self.ref.child("Pages").child(pageID).updateChildValues(addPage)
+        // self.ref.child("Pages").child(pageIDString).updateChildValues(addPage)
          connection?.cancel()
          })
          }
-
+        if pageID.text != "" {
+        if FBSDKAccessToken.current() != nil {
+            let request: FBSDKGraphRequest = FBSDKGraphRequest(graphPath: pageID.text, parameters: ["fields":"name,id,location,cover,website,picture,about"])
+            request.start(completionHandler: { (connection, results, error) in
+                if(error != nil){
+                    print(error as Any)
+                }
+                
+                if let resultArray = results as? NSDictionary {
+                    let locationDictionary = resultArray["location"] as? NSDictionary
+                    let coverDictionary = resultArray["cover"] as? NSDictionary
+                    let pictureDictionary = resultArray["picture"] as? NSDictionary
+                    let pictureData = pictureDictionary?["data"] as? NSDictionary
+                    
+                    let name = resultArray["name"] as? String ?? ""
+                    let ID = resultArray["id"] as? String ?? ""
+                    let about = resultArray["about"] as? String ?? ""
+                    let website = resultArray["website"] as? String ?? ""
+                    let coverPhoto = coverDictionary?["source"] as? String ?? ""
+                    let picture = pictureData?["url"] as? String ?? ""
+                    let city = locationDictionary?["city"] as? String ?? ""
+                    let country = locationDictionary?["country"] as? String ?? ""
+                    let latitude = locationDictionary?["latitude"] as? Double ?? 0
+                    let longitude = locationDictionary?["longitude"] as? Double ?? 0
+                    let address = locationDictionary?["street"] as? String ?? ""
+                    
+                    let venueDictionary = [
+                    "Name":name,
+                    "ID":ID,
+                    "About":about,
+                    "Website":website,
+                    "CoverPhoto":coverPhoto,
+                    "Picture":picture,
+                    "City":city,
+                    "Country":country,
+                    "Latitude":latitude,
+                    "Longitude":longitude,
+                    "Address":address
+                    ] as [String : Any]
+                    
+                    self.ref.child("Pages").child(self.pageID.text!).updateChildValues(venueDictionary)
+                }
+         
+            })
+        }
+        }
     }
 
     /*

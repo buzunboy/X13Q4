@@ -138,11 +138,11 @@
                   moduleName = "Beatrips-AdminPanel"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/burakuzunboy/Documents/Beatrips_New/AdminPanel/Beatrips-AdminPanel/Beatrips-AdminPanel/ViewControllers/PagesTableViewController.swift"
-                  timestampString = "524429792.622595"
+                  timestampString = "524434924.862751"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "76"
-                  endingLineNumber = "76"
+                  startingLineNumber = "50"
+                  endingLineNumber = "50"
                   offsetFromSymbolStart = "44">
                </Location>
                <Location
@@ -153,14 +153,30 @@
                   moduleName = "Beatrips-AdminPanel"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/burakuzunboy/Documents/Beatrips_New/AdminPanel/Beatrips-AdminPanel/Beatrips-AdminPanel/ViewControllers/PagesTableViewController.swift"
-                  timestampString = "524429792.624272"
+                  timestampString = "524434924.867778"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "76"
-                  endingLineNumber = "76"
+                  startingLineNumber = "50"
+                  endingLineNumber = "50"
                   offsetFromSymbolStart = "16">
                </Location>
             </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Beatrips-AdminPanel/ViewControllers/AddPageViewController.swift"
+            timestampString = "524434972.127882"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "92"
+            endingLineNumber = "92"
+            landmarkName = "sendPage(_:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

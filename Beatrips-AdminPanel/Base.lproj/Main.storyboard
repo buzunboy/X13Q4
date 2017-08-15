@@ -277,10 +277,21 @@
                                     <action selector="sendPage:" destination="Hzu-sO-5Jz" eventType="touchUpInside" id="fqr-Qo-5qT"/>
                                 </connections>
                             </button>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="rqi-u6-4Xx">
+                                <rect key="frame" x="87" y="293" width="201" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="201" id="6cU-e4-u8C"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="rqi-u6-4Xx" firstAttribute="top" secondItem="DqT-IZ-Y9Z" secondAttribute="bottom" constant="26" id="AVK-do-yb5"/>
                             <constraint firstItem="GLM-hU-H0f" firstAttribute="centerX" secondItem="8z7-Ve-pMT" secondAttribute="centerX" id="Kpf-qy-C16"/>
+                            <constraint firstItem="rqi-u6-4Xx" firstAttribute="centerX" secondItem="8z7-Ve-pMT" secondAttribute="centerX" id="MiK-1N-D4m"/>
                             <constraint firstItem="DqT-IZ-Y9Z" firstAttribute="centerX" secondItem="8z7-Ve-pMT" secondAttribute="centerX" id="TEd-On-osu"/>
                             <constraint firstItem="DqT-IZ-Y9Z" firstAttribute="top" secondItem="GLM-hU-H0f" secondAttribute="bottom" constant="26" id="abY-E7-t38"/>
                             <constraint firstItem="GLM-hU-H0f" firstAttribute="top" secondItem="LcW-25-O79" secondAttribute="bottom" constant="117" id="fPL-gf-olW"/>
@@ -288,11 +299,12 @@
                     </view>
                     <connections>
                         <outlet property="pageField" destination="GLM-hU-H0f" id="4Vk-zu-EAF"/>
+                        <outlet property="pageID" destination="rqi-u6-4Xx" id="Ze6-sO-sG6"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wwc-ju-Z3d" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3984.8000000000002" y="-215.44227886056973"/>
+            <point key="canvasLocation" x="4092" y="-215.44227886056973"/>
         </scene>
         <!--Pages-->
         <scene sceneID="aP1-1d-wZP">
