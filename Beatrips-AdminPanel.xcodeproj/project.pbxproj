@@ -137,9 +137,7 @@
 			children = (
 				B0A5A0E31F36153A00FD546A /* Beatrips-AdminPanel.entitlements */,
 				B00C97341F32487500DF4406 /* AppDelegate.swift */,
-				B0864CE41F406A70008A688C /* EventModel.swift */,
-				B00862C71F4212D200FA65F8 /* PagesModel.swift */,
-				B0A5A0E61F374A5C00FD546A /* monthConverter.swift */,
+				B0D5FC341F436C5300F93CE2 /* Models */,
 				B00862C61F4210D100FA65F8 /* View Controllers */,
 				B00C973A1F32487500DF4406 /* Main.storyboard */,
 				B00C973D1F32487500DF4406 /* Assets.xcassets */,
@@ -148,6 +146,16 @@
 				B00C97421F32487500DF4406 /* Info.plist */,
 			);
 			path = "Beatrips-AdminPanel";
+			sourceTree = "<group>";
+		};
+		B0D5FC341F436C5300F93CE2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B0864CE41F406A70008A688C /* EventModel.swift */,
+				B00862C71F4212D200FA65F8 /* PagesModel.swift */,
+				B0A5A0E61F374A5C00FD546A /* monthConverter.swift */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

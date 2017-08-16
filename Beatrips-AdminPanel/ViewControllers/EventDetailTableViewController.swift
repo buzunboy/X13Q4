@@ -67,15 +67,8 @@ class EventDetailTableViewController: UITableViewController {
         self.navigationController?.navigationBar.isTranslucent = true
         self.navigationController?.navigationBar.tintColor = UIColor.white
         self.navigationController?.navigationBar.shadowImage = UIImage()
-        activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.whiteLarge)
-        activityIndicator.color = UIColor.gray
-        activityIndicator.frame = CGRect(x: eventImage.frame.origin.x, y: eventImage.frame.origin.y, width: eventImage.frame.size.width, height: eventImage.frame.size.height)
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.startAnimating()
-        eventImage.image = UIImage()
-        view.addSubview(activityIndicator)
         
-
+        createReloadView()
         //view.addGestureRecognizer(tap)
         keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
         NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillShow(notification:)), name: .UIKeyboardWillShow, object: nil)
@@ -105,7 +98,6 @@ class EventDetailTableViewController: UITableViewController {
         
         keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - keyBoardHeight - 44 + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
         keyboardDone.items = items
-        // keyboardDone.backgroundColor = UIColor.red
         self.view.addSubview(keyboardDone)
     }
     
@@ -147,79 +139,90 @@ class EventDetailTableViewController: UITableViewController {
         })
     }
     
+    func createReloadView(){
+        activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.whiteLarge)
+        activityIndicator.color = UIColor.gray
+        activityIndicator.frame = CGRect(x: eventImage.frame.origin.x, y: eventImage.frame.origin.y, width: eventImage.frame.size.width, height: eventImage.frame.size.height)
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.startAnimating()
+        eventImage.image = UIImage()
+        view.addSubview(activityIndicator)
+    }
+    
 
     func getInfo(){
-        
-        
-        ref.child("Events").child(selectedID).observe(.value, with: { (snapshot) in
-            let eventInfo = [
-                "EventName":    snapshot.childSnapshot(forPath: "EventName").value as! String,
-                "VenueName":    snapshot.childSnapshot(forPath: "VenueName").value as! String,
-                "EventImage":   snapshot.childSnapshot(forPath: "EventImage").value as! String,
-                "VenueID":      snapshot.childSnapshot(forPath: "VenueID").value as! String,
-                "Details":      snapshot.childSnapshot(forPath: "Details").value as! String,
-                "TicketLink":   snapshot.childSnapshot(forPath: "TicketLink").value as? String ?? "",
-                "Day":          snapshot.childSnapshot(forPath: "Day").value as! String,
-                "Month":        snapshot.childSnapshot(forPath: "Month").value as! String,
-                "Year":         snapshot.childSnapshot(forPath: "Year").value as! String,
-                "Hour":         snapshot.childSnapshot(forPath: "Hour").value as! String,
-                "Minutes":      snapshot.childSnapshot(forPath: "Minutes").value as! String,
-                "isApproved":   snapshot.childSnapshot(forPath: "isApproved").value as! String,
-                "likeCount":    snapshot.childSnapshot(forPath: "likeCount").value as! String,
-                "seenCount":    snapshot.childSnapshot(forPath: "seenCount").value as! String,
-                "commentCount": snapshot.childSnapshot(forPath: "commentCount").value as! String,
-                
-                ] as [String:Any]
-            let locationDictionary = [
-                "Latitude":     snapshot.childSnapshot(forPath: "Latitude").value as? Double ?? 0,
-                "Longitude":    snapshot.childSnapshot(forPath: "Longitude").value as? Double ?? 0
-                ]
-            self.eventNameField.text = eventInfo["EventName"] as? String
-            self.venueNameField.text = eventInfo["VenueName"] as? String
-            self.descriptionText.text = eventInfo["Details"] as? String
-            self.dayLabel.text = eventInfo["Day"] as? String
-            self.monthLabel.text = eventInfo["Month"] as? String
-            self.yearLabel.text = eventInfo["Year"] as? String
-            self.hourLabel.text = eventInfo["Hour"] as? String
-            self.minuteLabel.text = eventInfo["Minutes"] as? String
-            self.ticketLink.text = eventInfo["TicketLink"] as? String
-            
-            let isApproved = eventInfo["isApproved"] as? String
-            self.isApprovedLabel.text = (isApproved == "1") ? "YES" : "NO"
-            
-            let annotation = MKPointAnnotation()
-            let latitude = Double(locationDictionary["Latitude"]!)
-            let longitude = Double(locationDictionary["Longitude"]!)
-            annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-            self.mapView.addAnnotation(annotation)
-            let region = MKCoordinateRegion(center: annotation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005))
-            self.mapView.setRegion(region, animated: true)
-            
-            self.likedCountLabel.text = String(describing: eventInfo["likeCount"]!)
-            self.seenCountLabel.text = String(describing: eventInfo["seenCount"]!)
-            self.commentCountLabel.text = String(describing:eventInfo["commentCount"]!)
-            
-            let url = URL(string: eventInfo["EventImage"] as! String)
-            
-            let maxHeight = self.descriptionText.sizeThatFits(CGSize(width: self.descriptionText.frame.size.width, height: CGFloat.greatestFiniteMagnitude))
-            if (maxHeight.height <= 70){
-                self.seeMore.isHidden = true
-                self.descriptionTextBottomConstraint.constant = 2
-            }
-            
+        DispatchQueue.global().async {
+        self.ref.child("Events").child(selectedID).observeSingleEvent(of: .value, with: { (snapshot) in
             DispatchQueue.global().async {
+                let eventInfo = [
+                    "EventName":    snapshot.childSnapshot(forPath: "EventName").value as! String,
+                    "VenueName":    snapshot.childSnapshot(forPath: "VenueName").value as! String,
+                    "EventImage":   snapshot.childSnapshot(forPath: "EventImage").value as! String,
+                    "VenueID":      snapshot.childSnapshot(forPath: "VenueID").value as! String,
+                    "Details":      snapshot.childSnapshot(forPath: "Details").value as! String,
+                    "TicketLink":   snapshot.childSnapshot(forPath: "TicketLink").value as? String ?? "",
+                    "Day":          snapshot.childSnapshot(forPath: "Day").value as! String,
+                    "Month":        snapshot.childSnapshot(forPath: "Month").value as! String,
+                    "Year":         snapshot.childSnapshot(forPath: "Year").value as! String,
+                    "Hour":         snapshot.childSnapshot(forPath: "Hour").value as! String,
+                    "Minutes":      snapshot.childSnapshot(forPath: "Minutes").value as! String,
+                    "isApproved":   snapshot.childSnapshot(forPath: "isApproved").value as! String,
+                    "likeCount":    snapshot.childSnapshot(forPath: "likeCount").value as! String,
+                    "seenCount":    snapshot.childSnapshot(forPath: "seenCount").value as! String,
+                    "commentCount": snapshot.childSnapshot(forPath: "commentCount").value as! String,
+                    
+                    ] as [String:Any]
+                let locationDictionary = [
+                    "Latitude":     snapshot.childSnapshot(forPath: "Latitude").value as? Double ?? 0,
+                    "Longitude":    snapshot.childSnapshot(forPath: "Longitude").value as? Double ?? 0
+                ]
+                
+                let url = URL(string: eventInfo["EventImage"] as! String)
                 let data = try? Data(contentsOf: url!)
                 DispatchQueue.main.async {
                     self.eventImage.image = UIImage(data: data!)
                     self.imageS = UIImage(data: data!)!
                     self.activityIndicator.stopAnimating()
                 }
+                DispatchQueue.main.async {
+                    self.eventNameField.text = eventInfo["EventName"] as? String
+                    self.venueNameField.text = eventInfo["VenueName"] as? String
+                    self.descriptionText.text = eventInfo["Details"] as? String
+                    self.dayLabel.text = eventInfo["Day"] as? String
+                    self.monthLabel.text = eventInfo["Month"] as? String
+                    self.yearLabel.text = eventInfo["Year"] as? String
+                    self.hourLabel.text = eventInfo["Hour"] as? String
+                    self.minuteLabel.text = eventInfo["Minutes"] as? String
+                    self.ticketLink.text = eventInfo["TicketLink"] as? String
+                    
+                    let isApproved = eventInfo["isApproved"] as? String
+                    self.isApprovedLabel.text = (isApproved == "1") ? "YES" : "NO"
+                    
+                    let annotation = MKPointAnnotation()
+                    let latitude = Double(locationDictionary["Latitude"]!)
+                    let longitude = Double(locationDictionary["Longitude"]!)
+                    annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                    self.mapView.addAnnotation(annotation)
+                    let region = MKCoordinateRegion(center: annotation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005))
+                    self.mapView.setRegion(region, animated: true)
+                    
+                    self.likedCountLabel.text = String(describing: eventInfo["likeCount"]!)
+                    self.seenCountLabel.text = String(describing: eventInfo["seenCount"]!)
+                    self.commentCountLabel.text = String(describing:eventInfo["commentCount"]!)
+                    let maxHeight = self.descriptionText.sizeThatFits(CGSize(width: self.descriptionText.frame.size.width, height: CGFloat.greatestFiniteMagnitude))
+                    if (maxHeight.height <= 70){
+                        self.seeMore.isHidden = true
+                        self.descriptionTextBottomConstraint.constant = 2
+                    }
+                    self.hiddenImageURL.text = eventInfo["EventImage"] as? String
+                }
             }
-            self.hiddenImageURL.text = eventInfo["EventImage"] as? String
+            
         })
+        }
     }
  
-    
+
     func approveEvent(sender: UIBarButtonItem){
         
         let addedDictionary = [
@@ -327,6 +330,8 @@ class EventDetailTableViewController: UITableViewController {
             return 40
         case 8:
             return 75
+        case 9:
+            return 55
         default:
             return 50
         }
@@ -344,7 +349,7 @@ class EventDetailTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 9
+        return 10
     }
     
     

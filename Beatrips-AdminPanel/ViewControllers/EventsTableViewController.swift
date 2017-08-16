@@ -10,11 +10,8 @@ import UIKit
 import FBSDKCoreKit
 import FirebaseDatabase
 
-var list: [String] = []
-var venueLists: [String] = ["8087014348"]
 var selectedID: String = ""
-
-var ref = Database.database().reference()
+var venues: [String] = [""]
 
 class cellClass: UITableViewCell{
     
@@ -30,16 +27,18 @@ class cellClass: UITableViewCell{
     
 }
 
-
 class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIViewControllerPreviewingDelegate {
     
+    var venueLists: [String] = []
     @IBOutlet var tableList: UITableView!
+    @IBOutlet weak var numberOfEvents: UIBarButtonItem!
     @IBOutlet weak var searchBar: UISearchBar!
     var EventList = [EventModel]()
     var refreshControls = UIRefreshControl()
     var filteredData = [EventModel]()
     var isSearching = false
     var visualEffectView = UIVisualEffectView()
+    var ref = Database.database().reference()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,6 +57,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
         refreshControls.addTarget(self, action: #selector(EventsTableViewController.refresh), for: UIControlEvents.valueChanged)
         tableView.addSubview(refreshControls)
+        refreshControls.beginRefreshing()
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -66,7 +66,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     }
     
     override func viewWillAppear(_ animated: Bool) {
-
+        
         self.navigationItem.setHidesBackButton(true, animated: false)
         setNavigationBar(isDisappear: false)
         
@@ -102,7 +102,8 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             self.navigationController?.navigationBar.topItem?.titleView = topView
             self.navigationController?.navigationBar.barStyle = .black
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(named: "background"), for: .default)
-            self.navigationController?.navigationBar.insertSubview(visualEffectView, at: 2)
+
+            self.navigationController?.navigationBar.insertSubview(visualEffectView, at: 0)
         }
         // Here you can add visual effects to any UIView control.
         // Replace custom view with navigation bar in above code to add effects to custom view.
@@ -120,69 +121,77 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
         show(viewControllerToCommit, sender: self)
     }
-    
+   
     func refresh(){
         getList()
         refreshControls.attributedTitle = NSAttributedString(string: "Let me check")
     }
     
     func getList(){
-        let eventCount = EventList.count
-        
-        if FBSDKAccessToken.current() != nil {
-            
-            for venue in venueLists{
-                let venueEventID = "/" + venue + "/events"
-                let request: FBSDKGraphRequest  = FBSDKGraphRequest(graphPath: venueEventID, parameters: ["fields": "attending_count,category,cover,description,interested_count,name,owner,picture,ticket_uri,place,start_time"])
-                request.start { (connection, results, error) in
-                    
-                    // Something went wrong
-                    if (error != nil) {
-                        print(error as Any)
-                    }
-                    // print(results)
-                    
-                    if let eventData = results as? NSDictionary{
-                        
-                        let events = eventData["data"] as? NSArray
-                        for event in events! {
-                            let eventDictionary = event as? NSDictionary
-                            let eventID = eventDictionary?["id"] as! String
-                            let placeData = eventDictionary?["place"] as? NSDictionary
-                            let placeLocation = placeData?["location"] as? NSDictionary
-                            let pictureData = eventDictionary?["cover"] as? NSDictionary
-                            let eventName = eventDictionary?["name"] as! String
-                            let eventDate = eventDictionary?["start_time"] as! String
-                            var dateArray = eventDate._split(separator: "-")
-                            let dayArray = dateArray[2]._split(separator: "T")
-                            var timeArray = dayArray[1]._split(separator: ":")
-                            
-                            let startTime = eventDictionary?["start_time"] as! String
-                            var dateArrays = startTime._split(separator: "T")
-                            var splitDate = dateArrays[0]._split(separator: "-")
-                            
-                            self.EventList.append(EventModel(name: eventName, ID: eventID, venue: placeData!["name"] as! String, venueID: placeData!["id"] as! String, image: pictureData!["source"] as! String, ticket: eventDictionary!["ticket_uri"] as? String ?? "", descriptionText: eventDictionary!["description"] as! String, day: splitDate[2], month: splitDate[1], year: splitDate[0], hour: timeArray[0], minute: timeArray[1], isApproved: "0", likeCount: "0", seenCount: "0", commentCount: "0", latitude: placeLocation!["latitude"] as? Double ?? 0, longitude: placeLocation!["longitude"] as? Double ?? 0))
-                            self.tableView.reloadData()
-                            
-                        }
-                    }
-                    if (eventCount >= 1){
-                        self.EventList.removeFirst(eventCount)
-                        self.tableView.reloadData()
-                        self.refreshControls.endRefreshing()
-                        self.refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
-                    }
-                    self.sendToDatabase()
-                }
-            }
+        DispatchQueue.main.async {
+
+        let eventCount = self.EventList.count
+        if (eventCount >= 1){
+            self.EventList.removeAll()
+            self.tableView.reloadData()
         }
         
+        self.ref.child("Pages").observe( .childAdded, with: { (pageSnap) in
+            if (pageSnap.key != ""){
+                if FBSDKAccessToken.current() != nil {
+                    // for venue in self.venueLists{
+                    let venueEventID = "/" + pageSnap.key + "/events"
+                    let request: FBSDKGraphRequest  = FBSDKGraphRequest(graphPath: venueEventID, parameters: ["fields": "attending_count,category,cover,description,interested_count,name,owner,picture,ticket_uri,place,start_time"])
+                    request.start { (connection, results, error) in
+                        
+                        // Something went wrong
+                        if (error != nil) {
+                            print(error as Any)
+                        }
+                        // print(results)
+                        
+                        if let eventData = results as? NSDictionary{
+                          //  print(eventData)
+                            let events = eventData["data"] as? NSArray
+                            for event in events! {
+                                DispatchQueue.main.async {
+                                let eventDictionary = event as? NSDictionary
+                                let eventID = eventDictionary?["id"] as? String ?? ""
+                                let placeData = eventDictionary?["place"] as? NSDictionary
+                                let placeLocation = placeData?["location"] as? NSDictionary
+                                let pictureData = eventDictionary?["cover"] as? NSDictionary
+                                let eventName = eventDictionary?["name"] as? String ?? ""
+                                let eventDate = eventDictionary?["start_time"] as? String ?? ""
+                                var dateArray = eventDate._split(separator: "-")
+                                let dayArray = dateArray[2]._split(separator: "T")
+                                var timeArray = dayArray[1]._split(separator: ":")
+                                
+                                let startTime = eventDictionary?["start_time"] as? String ?? ""
+                                var dateArrays = startTime._split(separator: "T")
+                                var splitDate = dateArrays[0]._split(separator: "-")
+                                
+                                self.EventList.append(EventModel(name: eventName, ID: eventID, venue: placeData?["name"] as? String ?? "", venueID: placeData?["id"] as? String ?? "", image: pictureData?["source"] as? String ?? "", ticket: eventDictionary?["ticket_uri"] as? String ?? "", descriptionText: eventDictionary?["description"] as? String ?? "", day: splitDate[2], month: splitDate[1], year: splitDate[0], hour: timeArray[0], minute: timeArray[1], isApproved: "0", likeCount: "0", seenCount: "0", commentCount: "0", latitude: placeLocation?["latitude"] as? Double ?? 0, longitude: placeLocation?["longitude"] as? Double ?? 0))
+                                self.tableView.reloadData()
+                                self.numberOfEvents.title = String(describing: self.EventList.count)
+                                    
+                                }
+                            }
+                        }
+                        self.sendToDatabase()
+                        self.refreshControls.endRefreshing()
+                        self.refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
+                        self.tableView.reloadData()
+                    }
+                }
+            }
+        })
+        }
     }
     
     func sendToDatabase() {
         
         for event in EventList {
-            ref.child("Events").child(event.ID).observe(.value, with: { (snapshot) in
+            ref.child("Events").child(event.ID).observeSingleEvent(of: .value, with: { (snapshot) in
                 let isApproved = snapshot.childSnapshot(forPath: "isApproved").value as? String
                 if (isApproved != "1"){
                     event.isApproved = "0"
@@ -205,7 +214,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                         "Latitude":event.latitude,
                         "Longitude":event.longitude
                         ] as [String : Any]
-                    ref.child("Events").child(event.ID).updateChildValues(nonApproved)
+                    self.ref.child("Events").child(event.ID).updateChildValues(nonApproved)
                     self.tableView.reloadData()
                 } else {
                     event.isApproved = "1"

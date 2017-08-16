@@ -28,13 +28,14 @@ class PagesTableViewController: UITableViewController, UIViewControllerPreviewin
         refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
         refreshControls.addTarget(self, action: #selector(PagesTableViewController.getPages), for: UIControlEvents.valueChanged)
         tableView.addSubview(refreshControls)
+        refreshControls.beginRefreshing()
         
         self.navigationController?.navigationBar.isHidden = false
         self.navigationItem.setHidesBackButton(true, animated: false)
         
         searchBar.delegate = self
         searchBar.returnKeyType = UIReturnKeyType.done
-        searchBar.placeholder = "Search Event"
+        searchBar.placeholder = "Search Page or Venue"
         
         if( traitCollection.forceTouchCapability == .available){
             registerForPreviewing(with: self, sourceView: view)
@@ -95,6 +96,9 @@ class PagesTableViewController: UITableViewController, UIViewControllerPreviewin
             self.navigationController?.navigationBar.topItem?.titleView = topView
             self.navigationController?.navigationBar.barStyle = .black
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(named: "background"), for: .default)
+            let addPage = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(PagesTableViewController.addPageSegue))
+            self.navigationItem.rightBarButtonItem = addPage
+            self.navigationItem.rightBarButtonItem?.tintColor = UIColor.white
             self.navigationController?.navigationBar.insertSubview(visualEffectView, at: 0)
         }
         // Here you can add visual effects to any UIView control.
@@ -103,16 +107,18 @@ class PagesTableViewController: UITableViewController, UIViewControllerPreviewin
 
     
     func getPages(){
-        Pages.removeAll()
-        ref.child("Pages").observe(.childAdded, with: { (snapshot) in
+        DispatchQueue.global().async {
+
+        self.Pages.removeAll()
+        self.ref.child("Pages").observe( .childAdded, with: { (snapshot) in
             if let pageID = snapshot.key as? String {
-                self.ref.child("Pages").child(pageID).observe(.value, with: { (snap) in
-                    var pageName = snap.childSnapshot(forPath: "Name").value as? String ?? ""
+                self.ref.child("Pages").child(pageID).observeSingleEvent(of: .value, with: { (snap) in
+                    let pageName = snap.childSnapshot(forPath: "Name").value as? String ?? ""
                     if(pageName != ""){
                         
                         let isActive = snap.childSnapshot(forPath: "isActive").value as? String ?? "0"
                         if(isActive != "0"){
-                            self.Pages.append(PagesModel(name: pageName, ID: pageID as? String ?? ""))
+                            self.Pages.append(PagesModel(name: pageName, ID: pageID))
                         }
                         
                     }
@@ -120,7 +126,13 @@ class PagesTableViewController: UITableViewController, UIViewControllerPreviewin
                 })
             }
         })
-        refreshControls.endRefreshing()
+        self.refreshControls.endRefreshing()
+        }
+    }
+    
+    
+    func addPageSegue(){
+        self.performSegue(withIdentifier: "addPageSegue", sender: self)
     }
     
     // MARK: - Table view data source
@@ -141,20 +153,23 @@ class PagesTableViewController: UITableViewController, UIViewControllerPreviewin
     
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+   
+
         let cell = tableView.dequeueReusableCell(withIdentifier: "pagesCell", for: indexPath)
-        
-        if(isSearching){
-            cell.textLabel?.text = filteredData[indexPath.row].name
-            cell.detailTextLabel?.text = filteredData[indexPath.row].ID
+             DispatchQueue.main.async {
+        if(self.isSearching){
+            cell.textLabel?.text = self.filteredData[indexPath.row].name
+            cell.detailTextLabel?.text = self.filteredData[indexPath.row].ID
         } else {
-            cell.textLabel?.text = Pages[indexPath.row].name
-            cell.detailTextLabel?.text = Pages[indexPath.row].ID
+            cell.textLabel?.text = self.Pages[indexPath.row].name
+            cell.detailTextLabel?.text = self.Pages[indexPath.row].ID
         }
         
-        
+    
+        }
         // Configure the cell...
-        
         return cell
+
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

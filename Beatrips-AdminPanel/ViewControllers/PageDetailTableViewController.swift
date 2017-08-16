@@ -55,11 +55,25 @@ class PageDetailTableViewController: UITableViewController {
         
         createRoundImage()
         
+        createReloadView()
+        
+        keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillShow(notification:)), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillHide(notification:)), name: .UIKeyboardWillHide, object: nil)
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        setNavigationBar(isComeFromViewDidAppear: true)
     }
 
     override func didReceiveMemoryWarning() {
@@ -88,6 +102,27 @@ class PageDetailTableViewController: UITableViewController {
             
         })
     }
+    
+    func keyBoardWillShow(notification: NSNotification) {
+        //handle appearing of keyboard here
+        let userInfo:NSDictionary = notification.userInfo! as NSDictionary
+        let keyboardFrame:NSValue = userInfo.value(forKey: UIKeyboardFrameEndUserInfoKey) as! NSValue
+        let keyboardRectangle = keyboardFrame.cgRectValue
+        var items = [UIBarButtonItem]()
+        let doneButton = UIBarButtonItem(title: "Done", style: .done, target: nil, action: #selector(PageDetailTableViewController.dismissKeyboard))
+        items.append(doneButton)
+        keyBoardHeight = keyboardRectangle.height
+        
+        keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - keyBoardHeight - 44 + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
+        keyboardDone.items = items
+        self.view.addSubview(keyboardDone)
+    }
+    
+    func keyBoardWillHide(notification: NSNotification) {
+        //handle dismiss of keyboard here
+        keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
+        keyboardDone.removeFromSuperview()
+    }
 
     func changeStatusBarColor(){
         currentStyle = .lightContent
@@ -103,9 +138,18 @@ class PageDetailTableViewController: UITableViewController {
         venueSmallImage.layer.borderColor = UIColor.orange.cgColor
     }
     
+    func createReloadView(){
+        activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.whiteLarge)
+        activityIndicator.color = UIColor.gray
+        activityIndicator.frame = CGRect(x: venueImage.frame.origin.x, y: venueImage.frame.origin.y, width: venueImage.frame.size.width, height: venueImage.frame.size.height)
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.startAnimating()
+        venueImage.image = UIImage()
+    }
+    
     func getInfo(){
         
-        ref.child("Pages").child(selectedPageID).observe(.value, with: { (snasphot) in
+        ref.child("Pages").child(selectedPageID).observeSingleEvent(of: .value, with: { (snasphot) in
 
             self.venueName.text = snasphot.childSnapshot(forPath: "Name").value as? String ?? ""
             self.websiteField.text = snasphot.childSnapshot(forPath: "Website").value as? String ?? ""
@@ -131,7 +175,7 @@ class PageDetailTableViewController: UITableViewController {
             
             
             let maxHeight = self.descriptionText.sizeThatFits(CGSize(width: self.descriptionText.frame.size.width, height: CGFloat.greatestFiniteMagnitude))
-            if (maxHeight.height <= 70){
+            if (maxHeight.height <= 50){
                 self.seeMore.isHidden = true
                 self.descriptionTextBottomConstraint.constant = 2
             }
@@ -152,11 +196,8 @@ class PageDetailTableViewController: UITableViewController {
             self.mapView.addAnnotation(annotation)
             let region = MKCoordinateRegion(center: annotation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005))
             self.mapView.setRegion(region, animated: true)
-            
-            
-            
         })
-        
+    
     }
     
     func approveEvent(sender: UIBarButtonItem){
@@ -237,7 +278,7 @@ class PageDetailTableViewController: UITableViewController {
         var row6Height: CGFloat = 70
         if (selectedRow == 5){
             let maxHeight = descriptionText.sizeThatFits(CGSize(width: descriptionText.frame.size.width, height: CGFloat.greatestFiniteMagnitude))
-            row6Height = (maxHeight.height >= 70) ? maxHeight.height + 40 : 70
+            row6Height = (maxHeight.height >= 50) ? maxHeight.height + 40 : 70
             descriptionTextBottomConstraint.constant = 0
             seeMore.isHidden = true
         }
@@ -273,6 +314,10 @@ class PageDetailTableViewController: UITableViewController {
             self.tableView.endUpdates()
         }
         
+    }
+    
+    func dismissKeyboard(){
+        view.endEditing(true)
     }
 
     /*
