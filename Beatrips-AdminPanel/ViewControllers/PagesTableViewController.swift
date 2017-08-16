@@ -50,10 +50,13 @@ class PagesTableViewController: UITableViewController, UIViewControllerPreviewin
     
     override func viewWillAppear(_ animated: Bool) {
         self.navigationItem.setHidesBackButton(true, animated: false)
-        setNavigationBar(isDisappear: false)
         Pages.removeAll()
         self.tableView.reloadData()
         getPages()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        setNavigationBar(isDisappear: false)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -93,6 +96,7 @@ class PagesTableViewController: UITableViewController, UIViewControllerPreviewin
             let topView = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
             topView.textColor = UIColor.white
             topView.text = "Pages & Venues"
+            
             self.navigationController?.navigationBar.topItem?.titleView = topView
             self.navigationController?.navigationBar.barStyle = .black
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(named: "background"), for: .default)
@@ -107,9 +111,13 @@ class PagesTableViewController: UITableViewController, UIViewControllerPreviewin
 
     
     func getPages(){
+        let pageCount = self.Pages.count
+        if (pageCount >= 1){
+            self.Pages.removeAll()
+            self.tableView.reloadData()
+        }
         DispatchQueue.global().async {
 
-        self.Pages.removeAll()
         self.ref.child("Pages").observe( .childAdded, with: { (snapshot) in
             if let pageID = snapshot.key as? String {
                 self.ref.child("Pages").child(pageID).observeSingleEvent(of: .value, with: { (snap) in

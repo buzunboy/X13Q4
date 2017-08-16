@@ -66,19 +66,16 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        
         self.navigationItem.setHidesBackButton(true, animated: false)
-        setNavigationBar(isDisappear: false)
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        setNavigationBar(isDisappear: false)
         getList()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         setNavigationBar(isDisappear: true)
-        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -102,7 +99,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
             self.navigationController?.navigationBar.topItem?.titleView = topView
             self.navigationController?.navigationBar.barStyle = .black
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(named: "background"), for: .default)
-
+            
             self.navigationController?.navigationBar.insertSubview(visualEffectView, at: 0)
         }
         // Here you can add visual effects to any UIView control.
@@ -121,7 +118,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
         show(viewControllerToCommit, sender: self)
     }
-   
+    
     func refresh(){
         getList()
         refreshControls.attributedTitle = NSAttributedString(string: "Let me check")
@@ -129,62 +126,69 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
     
     func getList(){
         DispatchQueue.main.async {
-
-        let eventCount = self.EventList.count
-        if (eventCount >= 1){
-            self.EventList.removeAll()
-            self.tableView.reloadData()
-        }
-        
-        self.ref.child("Pages").observe( .childAdded, with: { (pageSnap) in
-            if (pageSnap.key != ""){
-                if FBSDKAccessToken.current() != nil {
-                    // for venue in self.venueLists{
-                    let venueEventID = "/" + pageSnap.key + "/events"
-                    let request: FBSDKGraphRequest  = FBSDKGraphRequest(graphPath: venueEventID, parameters: ["fields": "attending_count,category,cover,description,interested_count,name,owner,picture,ticket_uri,place,start_time"])
-                    request.start { (connection, results, error) in
-                        
-                        // Something went wrong
-                        if (error != nil) {
-                            print(error as Any)
-                        }
-                        // print(results)
-                        
-                        if let eventData = results as? NSDictionary{
-                          //  print(eventData)
-                            let events = eventData["data"] as? NSArray
-                            for event in events! {
-                                DispatchQueue.main.async {
-                                let eventDictionary = event as? NSDictionary
-                                let eventID = eventDictionary?["id"] as? String ?? ""
-                                let placeData = eventDictionary?["place"] as? NSDictionary
-                                let placeLocation = placeData?["location"] as? NSDictionary
-                                let pictureData = eventDictionary?["cover"] as? NSDictionary
-                                let eventName = eventDictionary?["name"] as? String ?? ""
-                                let eventDate = eventDictionary?["start_time"] as? String ?? ""
-                                var dateArray = eventDate._split(separator: "-")
-                                let dayArray = dateArray[2]._split(separator: "T")
-                                var timeArray = dayArray[1]._split(separator: ":")
-                                
-                                let startTime = eventDictionary?["start_time"] as? String ?? ""
-                                var dateArrays = startTime._split(separator: "T")
-                                var splitDate = dateArrays[0]._split(separator: "-")
-                                
-                                self.EventList.append(EventModel(name: eventName, ID: eventID, venue: placeData?["name"] as? String ?? "", venueID: placeData?["id"] as? String ?? "", image: pictureData?["source"] as? String ?? "", ticket: eventDictionary?["ticket_uri"] as? String ?? "", descriptionText: eventDictionary?["description"] as? String ?? "", day: splitDate[2], month: splitDate[1], year: splitDate[0], hour: timeArray[0], minute: timeArray[1], isApproved: "0", likeCount: "0", seenCount: "0", commentCount: "0", latitude: placeLocation?["latitude"] as? Double ?? 0, longitude: placeLocation?["longitude"] as? Double ?? 0))
-                                self.tableView.reloadData()
-                                self.numberOfEvents.title = String(describing: self.EventList.count)
-                                    
+            
+            let eventCount = self.EventList.count
+            if (eventCount >= 1){
+                self.EventList.removeAll()
+                self.tableView.reloadData()
+            }
+            
+            self.ref.child("Pages").observe( .childAdded, with: { (pageSnap) in
+                if (pageSnap.key != ""){
+                    if FBSDKAccessToken.current() != nil {
+                        // for venue in self.venueLists{
+                        let venueEventID = "/" + pageSnap.key + "/events"
+                        let request: FBSDKGraphRequest  = FBSDKGraphRequest(graphPath: venueEventID, parameters: ["fields": "attending_count,category,cover,description,interested_count,name,owner,picture,ticket_uri,place,start_time"])
+                        request.start { (connection, results, error) in
+                            
+                            // Something went wrong
+                            if (error != nil) {
+                                print(error as Any)
+                            }
+                            // print(results)
+                            if let eventData = results as? NSDictionary{
+                                //  print(eventData)
+                                let events = eventData["data"] as? NSArray
+                                for event in events! {
+                                    DispatchQueue.main.async {
+                                        let eventDictionary = event as? NSDictionary
+                                        let eventID = eventDictionary?["id"] as? String ?? ""
+                                        let placeData = eventDictionary?["place"] as? NSDictionary
+                                        let placeLocation = placeData?["location"] as? NSDictionary
+                                        let pictureData = eventDictionary?["cover"] as? NSDictionary
+                                        let eventName = eventDictionary?["name"] as? String ?? ""
+                                        let eventDate = eventDictionary?["start_time"] as? String ?? ""
+                                        var dateArray = eventDate._split(separator: "-")
+                                        let dayArray = dateArray[2]._split(separator: "T")
+                                        var timeArray = dayArray[1]._split(separator: ":")
+                                        
+                                        let startTime = eventDictionary?["start_time"] as? String ?? ""
+                                        var dateArrays = startTime._split(separator: "T")
+                                        var splitDate = dateArrays[0]._split(separator: "-")
+                                        
+                                        let venue = placeData?["name"] as? String ?? ""
+                                        let venueID = placeData?["id"] as? String ?? ""
+                                        let image = pictureData?["source"] as? String ?? ""
+                                        let ticket = eventDictionary?["ticket_uri"] as? String ?? ""
+                                        let descriptionText = eventDictionary?["description"] as? String ?? ""
+                                        let latitude = placeLocation?["latitude"] as? Double ?? 0
+                                        let longitude = placeLocation?["longitude"] as? Double ?? 0
+                                        
+                                        self.EventList.append(EventModel(name: eventName, ID: eventID, venue: venue, venueID: venueID, image: image, ticket: ticket, descriptionText: descriptionText, day: splitDate[2], month: splitDate[1], year: splitDate[0], hour: timeArray[0], minute: timeArray[1], isApproved: "0", likeCount: "0", seenCount: "0", commentCount: "0", latitude: latitude, longitude: longitude, isEditorChoice: "0", isPromoted: "0", genres: [""]))
+                                        self.tableView.reloadData()
+                                        self.numberOfEvents.title = String(describing: self.EventList.count)
+                                        
+                                    }
                                 }
                             }
+                            self.sendToDatabase()
+                            self.refreshControls.endRefreshing()
+                            self.refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
+                            self.tableView.reloadData()
                         }
-                        self.sendToDatabase()
-                        self.refreshControls.endRefreshing()
-                        self.refreshControls.attributedTitle = NSAttributedString(string: "Let's see what is new?")
-                        self.tableView.reloadData()
                     }
                 }
-            }
-        })
+            })
         }
     }
     
@@ -212,7 +216,10 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
                         "seenCount":"0",
                         "commentCount":"0",
                         "Latitude":event.latitude,
-                        "Longitude":event.longitude
+                        "Longitude":event.longitude,
+                        "isEditorChoice": "0",
+                        "isPromoted": "0",
+                        "Genres": [""]
                         ] as [String : Any]
                     self.ref.child("Events").child(event.ID).updateChildValues(nonApproved)
                     self.tableView.reloadData()
@@ -307,7 +314,7 @@ class EventsTableViewController: UITableViewController, UISearchBarDelegate, UIV
         } else {
             isSearching = true
             filteredData = EventList.filter({ (mod) -> Bool in
-                return mod.name.lowercased().contains(searchBar.text!.lowercased()) || mod.venue.lowercased().contains(searchBar.text!.lowercased())
+                return mod.name.lowercased().contains(searchBar.text!.lowercased()) || mod.venue.lowercased().contains(searchBar.text!.lowercased()) || mod.eventDate.trimmingCharacters(in: .whitespaces).lowercased().contains(searchBar.text!.trimmingCharacters(in: .whitespaces).lowercased())
             })
             tableView.reloadData()
         }

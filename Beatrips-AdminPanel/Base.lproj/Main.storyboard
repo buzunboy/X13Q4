@@ -755,7 +755,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="GLM-hU-H0f">
-                                <rect key="frame" x="87.5" y="181" width="200" height="30"/>
+                                <rect key="frame" x="87.5" y="137" width="200" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="Hlo-03-bDJ"/>
                                 </constraints>
@@ -764,7 +764,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DqT-IZ-Y9Z">
-                                <rect key="frame" x="125" y="237" width="124" height="30"/>
+                                <rect key="frame" x="125" y="193" width="124" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="124" id="cAe-z9-akX"/>
                                 </constraints>
@@ -774,7 +774,7 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="rqi-u6-4Xx">
-                                <rect key="frame" x="87" y="293" width="201" height="30"/>
+                                <rect key="frame" x="87" y="249" width="201" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="201" id="6cU-e4-u8C"/>
                                 </constraints>
@@ -1355,8 +1355,57 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="100" id="8DX-cP-X0X">
+                                        <rect key="frame" x="0.0" y="673" width="375" height="100"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="8DX-cP-X0X" id="gsp-Z4-onS">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="100"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hwf-NI-9Np">
+                                                    <rect key="frame" x="8" y="35" width="242" height="30"/>
+                                                    <nil key="textColor"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <textInputTraits key="textInputTraits"/>
+                                                </textField>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Genres" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ndU-IQ-z4d">
+                                                    <rect key="frame" x="8" y="6" width="101" height="21"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="21" id="6p9-2K-1Dn"/>
+                                                        <constraint firstAttribute="width" constant="101" id="SAl-Mv-7bs"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cjW-KF-G9f" customClass="genresButton" customModule="Beatrips_AdminPanel" customModuleProvider="target">
+                                                    <rect key="frame" x="8" y="70" width="46" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="8"/>
+                                                    <state key="normal" title="Deneme 123 123"/>
+                                                </button>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c16-r2-tzI">
+                                                    <rect key="frame" x="278" y="35" width="91" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="91" id="9fh-az-WMZ"/>
+                                                        <constraint firstAttribute="height" constant="30" id="9jx-ej-j3Q"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Add Genre"/>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="c16-r2-tzI" secondAttribute="trailing" constant="6" id="1LW-Sf-50q"/>
+                                                <constraint firstItem="ndU-IQ-z4d" firstAttribute="top" secondItem="gsp-Z4-onS" secondAttribute="top" constant="6" id="1c8-jR-u8b"/>
+                                                <constraint firstItem="hwf-NI-9Np" firstAttribute="top" secondItem="ndU-IQ-z4d" secondAttribute="bottom" constant="8" id="3Bi-qJ-QP0"/>
+                                                <constraint firstItem="hwf-NI-9Np" firstAttribute="leading" secondItem="gsp-Z4-onS" secondAttribute="leadingMargin" id="5Zq-Km-fZI"/>
+                                                <constraint firstItem="c16-r2-tzI" firstAttribute="centerY" secondItem="hwf-NI-9Np" secondAttribute="centerY" id="Zqe-BB-yoR"/>
+                                                <constraint firstItem="c16-r2-tzI" firstAttribute="leading" secondItem="hwf-NI-9Np" secondAttribute="trailing" constant="28" id="dD0-RJ-jGT"/>
+                                                <constraint firstItem="ndU-IQ-z4d" firstAttribute="leading" secondItem="gsp-Z4-onS" secondAttribute="leading" constant="8" id="eES-zb-PQI"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="40" id="CEv-3P-ypa">
-                                        <rect key="frame" x="0.0" y="673" width="375" height="40"/>
+                                        <rect key="frame" x="0.0" y="773" width="375" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CEv-3P-ypa" id="YuR-XT-5Da">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="40"/>
@@ -1407,7 +1456,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="75" id="SZB-wY-HPe">
-                                        <rect key="frame" x="0.0" y="713" width="375" height="75"/>
+                                        <rect key="frame" x="0.0" y="813" width="375" height="75"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="SZB-wY-HPe" id="RJE-WL-iLW">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="75"/>
@@ -1484,7 +1533,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="55" id="EYh-Kf-CSo">
-                                        <rect key="frame" x="0.0" y="788" width="375" height="55"/>
+                                        <rect key="frame" x="0.0" y="888" width="375" height="55"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="EYh-Kf-CSo" id="tU1-Oi-BJb">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="55"/>
@@ -1524,7 +1573,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Go2-Cl-ltA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1431" y="2579"/>
+            <point key="canvasLocation" x="-1431.2" y="2578.5607196401802"/>
         </scene>
         <!--Item-->
         <scene sceneID="Rwb-Na-0Fr">

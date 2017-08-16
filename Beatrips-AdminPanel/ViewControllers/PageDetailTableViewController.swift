@@ -75,6 +75,10 @@ class PageDetailTableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         setNavigationBar(isComeFromViewDidAppear: true)
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        setNavigationBar(isComeFromViewDidAppear: false)
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

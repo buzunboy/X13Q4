@@ -35,6 +35,7 @@ class EventDetailTableViewController: UITableViewController {
     
     @IBOutlet weak var hiddenImageURL: UILabel!
     @IBOutlet weak var seeMore: UIButton!
+    @IBOutlet weak var genresCollection: UICollectionView!
     
     var selectedRow = -1
     var lastY: CGFloat = 0.0
@@ -73,6 +74,8 @@ class EventDetailTableViewController: UITableViewController {
         keyboardDone.frame = CGRect(x: 0, y: UIScreen.main.bounds.height + tableView.contentOffset.y, width: UIScreen.main.bounds.width, height: 44)
         NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillShow(notification:)), name: .UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillHide(notification:)), name: .UIKeyboardWillHide, object: nil)
+        
+       
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -327,10 +330,12 @@ class EventDetailTableViewController: UITableViewController {
         case 6:
             return row6Height
         case 7:
-            return 40
+            return 100
         case 8:
-            return 75
+            return 40
         case 9:
+            return 75
+        case 10:
             return 55
         default:
             return 50
@@ -349,7 +354,7 @@ class EventDetailTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 10
+        return 11
     }
     
     
@@ -373,16 +378,16 @@ class EventDetailTableViewController: UITableViewController {
     func dismissKeyboard(){
         view.endEditing(true)
     }
-    /*
-     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-     let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
+    
+    /* override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+     let cell = tableView.dequeueReusableCell(withIdentifier: "genresCell", for: indexPath) as! GenresTableViewCell
      
      // Configure the cell...
      
      return cell
      }
-     */
     
+    */
     /*
      // Override to support conditional editing of the table view.
      override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

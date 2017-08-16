@@ -18,6 +18,7 @@
 		B00C973E1F32487500DF4406 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B00C973D1F32487500DF4406 /* Assets.xcassets */; };
 		B00C97411F32487500DF4406 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B00C973F1F32487500DF4406 /* LaunchScreen.storyboard */; };
 		B00C974B1F3249C600DF4406 /* EventsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00C974A1F3249C600DF4406 /* EventsTableViewController.swift */; };
+		B01339AC1F44B4EE00753370 /* genresButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01339AB1F44B4EE00753370 /* genresButton.swift */; };
 		B0397EFC1F3DCC8F000F1F53 /* EventDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0397EFB1F3DCC8F000F1F53 /* EventDetailTableViewController.swift */; };
 		B049FC301F385501002081A1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B049FC2F1F385501002081A1 /* GoogleService-Info.plist */; };
 		B049FC321F38592A002081A1 /* EventDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B049FC311F38592A002081A1 /* EventDetailViewController.swift */; };
@@ -46,6 +47,7 @@
 		B00C97401F32487500DF4406 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B00C97421F32487500DF4406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B00C974A1F3249C600DF4406 /* EventsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventsTableViewController.swift; path = ViewControllers/EventsTableViewController.swift; sourceTree = "<group>"; };
+		B01339AB1F44B4EE00753370 /* genresButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = genresButton.swift; path = "Event Model/genresButton.swift"; sourceTree = "<group>"; };
 		B0397EFB1F3DCC8F000F1F53 /* EventDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventDetailTableViewController.swift; path = ViewControllers/EventDetailTableViewController.swift; sourceTree = "<group>"; };
 		B049FC2F1F385501002081A1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B049FC311F38592A002081A1 /* EventDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventDetailViewController.swift; path = ViewControllers/EventDetailViewController.swift; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 				B0864CE41F406A70008A688C /* EventModel.swift */,
 				B00862C71F4212D200FA65F8 /* PagesModel.swift */,
 				B0A5A0E61F374A5C00FD546A /* monthConverter.swift */,
+				B01339AB1F44B4EE00753370 /* genresButton.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B00862C51F4210BA00FA65F8 /* PagesTableViewController.swift in Sources */,
+				B01339AC1F44B4EE00753370 /* genresButton.swift in Sources */,
 				B00C97391F32487500DF4406 /* SecondViewController.swift in Sources */,
 				B0864CE51F406A70008A688C /* EventModel.swift in Sources */,
 				B00862C81F4212D200FA65F8 /* PagesModel.swift in Sources */,
